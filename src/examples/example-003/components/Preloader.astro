@@ -1,0 +1,36 @@
+---
+import { Image } from "astro:assets";
+import { PRELOAD } from "../data";
+---
+<div class="preloader" aria-hidden="true">
+  <div class="pre-arch">
+    {PRELOAD.map((img, i) => (
+      <Image
+        src={img} alt="" widths={[1000, 1600, 2000]} sizes="100vw"
+        loading={i === PRELOAD.length - 1 ? "eager" : "lazy"}
+        class:list={["pre-img", { last: i === PRELOAD.length - 1 }]}
+      />
+    ))}
+  </div>
+  <div class="pre-ui">
+    <div class="pre-top">
+      <p class="label">Lengkung — arsitek</p>
+      <p class="label">Entering</p>
+    </div>
+    <div class="pre-bottom">
+      <p class="pre-title">Lengkung</p>
+      <p class="pre-count tnum">000</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .preloader { position: fixed; inset: 0; z-index: 100; display: none; background: var(--paper); color: var(--ink); }
+  :global(html.js-motion.first-visit) .preloader { display: block; }
+  .pre-arch { position: absolute; inset: 0; clip-path: inset(50% 50% 50% 50%); }
+  .pre-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; visibility: hidden; }
+  .pre-ui { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: var(--gutter); }
+  .pre-top, .pre-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+  .pre-title { font-family: var(--ff-display); font-weight: 500; font-size: clamp(3.5rem, 11vw, 15rem); line-height: 0.85; letter-spacing: -0.04em; }
+  .pre-count { font-family: var(--ff-display); font-size: clamp(2rem, 4vw, 5rem); line-height: 0.85; }
+</style>

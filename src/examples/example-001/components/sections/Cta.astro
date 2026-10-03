@@ -1,0 +1,32 @@
+<section id="trial" class="cta invert" data-nav-dark data-cta>
+  <div class="container cta-inner">
+    <p class="mono bracket">14 days free · No card</p>
+    <h2 class="cta-title" data-copy="chars">Hit first<br />crack.</h2>
+    <div class="cta-row">
+      <p class="lg">Connect your roaster in under ten minutes. Bring your Artisan logs — we import them.</p>
+      <a href="#signup" class="btn cta-btn" data-magnetic><span>Start free trial <span class="arrow" aria-hidden="true">→</span></span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { padding-block: 9rem 7rem; overflow: clip; }
+  .cta-inner { display: flex; flex-direction: column; gap: 2.5rem; }
+  .cta-title { font-size: clamp(4rem, 15vw, 24rem); line-height: 0.8; }
+  .cta-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; }
+  .cta-row p { max-width: 30ch; }
+  .cta-btn { background: var(--paper); color: var(--ink); padding: 1.4rem 2rem; font-size: 1rem; }
+  @media (max-width: 1000px) {
+    .cta { padding-block: 6rem 5rem; }
+    .cta-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<script>
+  import { onPage } from "../../scripts/lifecycle.js";
+  import { magnetic } from "../../scripts/magnetic.js";
+  onPage("[data-cta]", (root) => {
+    const offs = [...root.querySelectorAll("[data-magnetic]")].map((el) => magnetic(el));
+    return () => offs.forEach((off) => off());
+  });
+</script>

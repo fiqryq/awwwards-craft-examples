@@ -1,0 +1,31 @@
+---
+const names = ["Kopi Tani", "Hutan Roasters", "Northbound Coffee", "Selasa Roastery", "Two Rivers", "Arang & Co.", "Bukit Coffee Lab", "Halte Roasting", "Paper Moon", "Kebun Kecil"];
+---
+<section class="marquee-wrap" aria-label="Roasteries using Firstcrack">
+  <p class="mono bracket container label">Trusted by 340 roasteries in 22 countries</p>
+  <div class="marquee" data-marquee data-speed="40" data-scroll-reactive>
+    <div class="marquee-track">
+      {[0, 1].map((copy) => names.map((n) => (
+        <span class="marquee-item" aria-hidden={copy === 1 ? "true" : undefined}>{n}<i aria-hidden="true">✺</i></span>
+      )))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .marquee-wrap { padding-block: 4rem 5rem; border-top: 1px solid color-mix(in oklab, var(--ink) 25%, transparent); }
+  .label { margin-bottom: 2rem; }
+  .marquee { overflow: hidden; }
+  .marquee-track { display: flex; width: max-content; }
+  .marquee-item {
+    display: inline-flex; align-items: center; gap: 2.5rem; padding-right: 2.5rem; white-space: nowrap;
+    font-family: var(--ff-display); font-weight: 800; font-size: clamp(2.5rem, 6vw, 7rem); letter-spacing: -0.04em; line-height: 1;
+  }
+  .marquee-item i { font-style: normal; font-size: 0.45em; }
+</style>
+
+<script>
+  import { onPage } from "../../scripts/lifecycle.js";
+  import { marquee } from "../../scripts/marquee.js";
+  onPage("[data-marquee]", (root, { reduced }) => (reduced ? undefined : marquee(root)));
+</script>

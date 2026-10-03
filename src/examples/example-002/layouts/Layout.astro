@@ -1,0 +1,46 @@
+---
+import { Font } from "astro:assets";
+import Nav from "../components/Nav.astro";
+import Preloader from "../components/Preloader.astro";
+import ExampleBadge from "../../../shared/ExampleBadge.astro";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "" } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#190bb6" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <Font cssVariable="--f2-display" preload />
+    <Font cssVariable="--f2-body" preload />
+    <Font cssVariable="--f2-mono" />
+    <script is:inline>
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches || location.search.includes("reduced");
+      if (!reduce) document.documentElement.classList.add("js-motion");
+      if (!sessionStorage.getItem("seen-002")) document.documentElement.classList.add("first-visit");
+      history.scrollRestoration = "manual";
+    </script>
+  </head>
+  <body>
+    <Preloader />
+    <Nav />
+    <main class="page"><slot /></main>
+    <ExampleBadge n="002" />
+    <script>
+      import "../scripts/lenis-gsap";
+      import "../scripts/copy-reveal";
+      import "../scripts/preloader";
+      import "../scripts/menu";
+      import "../scripts/site";
+    </script>
+  </body>
+</html>

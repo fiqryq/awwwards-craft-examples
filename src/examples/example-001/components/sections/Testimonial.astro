@@ -1,0 +1,23 @@
+<section id="customers" class="testimonial container">
+  <p class="mono bracket">From the roastery floor</p>
+  <blockquote>
+    <p class="quote" data-copy="lines">“We stopped roasting from memory. Every Guji now lands within two seconds of the profile, and I finally know what's in the warehouse on a Monday.”</p>
+    <footer class="who">
+      <span class="avatar" aria-hidden="true">RA</span>
+      <span><strong>Rani Ardhana</strong><br /><span class="mono">Head roaster, Selasa Roastery · Bandung</span></span>
+    </footer>
+  </blockquote>
+</section>
+
+<style>
+  .testimonial { padding-block: 8rem; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); }
+  .testimonial > .mono { grid-column: 1 / span 3; }
+  blockquote { grid-column: 4 / -1; display: flex; flex-direction: column; gap: 3rem; }
+  .quote { font-family: var(--ff-display); font-weight: 800; font-size: clamp(2rem, 4.2vw, 5.75rem); line-height: 0.98; letter-spacing: -0.035em; text-wrap: balance; }
+  .who { display: flex; align-items: center; gap: 1rem; color: var(--deep); }
+  .avatar { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: var(--ink); color: var(--paper); font-family: var(--ff-mono); font-size: 0.9rem; }
+  @media (max-width: 1000px) {
+    .testimonial { padding-block: 5rem; row-gap: 2rem; }
+    .testimonial > .mono, blockquote { grid-column: 1 / -1; }
+  }
+</style>

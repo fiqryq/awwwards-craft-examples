@@ -1,0 +1,43 @@
+---
+import { Image } from "astro:assets";
+import { EXHIBITION, ARTISTS, SIDE } from "../../data";
+---
+<section class="now-showing" id="now">
+  <div class="container">
+    <div class="label-row">
+      <p class="label">[ 01 ] Now showing</p>
+      <p class="label">{EXHIBITION.dates}</p>
+    </div>
+    <div class="cols grid">
+      <h2 class="title" data-copy="lines"><em>{EXHIBITION.title}</em><br />{EXHIBITION.english}</h2>
+      <figure class="side reveal-clip">
+        <Image src={SIDE.img} alt={SIDE.alt} widths={[500, 900, 1300]} sizes="(max-width: 1000px) 100vw, 30vw" />
+      </figure>
+      <p class="lg statement" data-copy="lines">
+        Seven photographers working only in black and white, and only with what is left over: a shadow on a wall, a face after the light has gone, a building that is mostly weather. Forty-two prints across three rooms.
+      </p>
+      <dl class="credits">
+        <div class="reveal-up"><dt class="label muted">Curator</dt><dd>{EXHIBITION.curator.replace("Curated by ", "")}</dd></div>
+        <div class="reveal-up"><dt class="label muted">Where</dt><dd>{EXHIBITION.rooms}, ground floor</dd></div>
+        <div class="reveal-up"><dt class="label muted">Artists</dt><dd>{ARTISTS.join(", ")}</dd></div>
+        <div class="reveal-up"><dt class="label muted">Entry</dt><dd>Free · no booking needed</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .now-showing { padding-block: 6rem 7rem; }
+  .grid { padding-top: 2.5rem; row-gap: 3rem; align-items: start; }
+  .title { grid-column: 1 / span 8; }
+  .title em { font-style: italic; }
+  .side { grid-column: 10 / span 3; grid-row: 1 / span 2; aspect-ratio: 3 / 4; overflow: hidden; }
+  .statement { grid-column: 1 / span 7; }
+  .credits { grid-column: 1 / span 8; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem var(--gutter); }
+  .credits div { display: grid; gap: 0.4rem; padding-top: 0.8rem; border-top: 1px solid var(--line); }
+  @media (max-width: 1000px) {
+    .now-showing { padding-block: 4.5rem 5rem; }
+    .side { grid-row: auto; aspect-ratio: 4 / 5; }
+    .credits { grid-template-columns: 1fr; }
+  }
+</style>

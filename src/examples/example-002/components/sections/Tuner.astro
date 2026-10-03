@@ -1,0 +1,251 @@
+---
+import { STATIONS, BAND } from "../../data";
+
+// Dial scale: 150 px per MHz, ticks every 0.1 MHz, labels every MHz.
+const PX = 150;
+const span = BAND.max - BAND.min;
+const width = Math.round(span * PX);
+const ticks = Array.from({ length: Math.round(span * 10) + 1 }, (_, i) => {
+  const f = BAND.min + i / 10;
+  const x = Math.round((f - BAND.min) * PX * 10) / 10;
+  const whole = Math.abs(f - Math.round(f)) < 0.001;
+  const half = Math.abs(f * 2 - Math.round(f * 2)) < 0.001;
+  return { x, f, whole, half };
+});
+const bars = Array.from({ length: 12 }, (_, i) => i);
+---
+<section class="tuner invert" id="tune" data-nav-dark data-tuner data-px={PX}>
+  <div class="tuner-stage container">
+    <div class="label-row">
+      <p class="mono">[ 01 ] Tune in</p>
+      <p class="mono hide-sm">Four stages, four stations</p>
+      <p class="mono">{BAND.min.toFixed(1)} — {BAND.max.toFixed(1)} MHz</p>
+    </div>
+
+    <div class="tuner-body">
+      <div class="readout" aria-hidden="true">
+        <p class="freq tnum"><span class="freq-value">{BAND.min.toFixed(1)}</span><span class="unit">MHz</span></p>
+        <p class="mono status"><span class="dot"></span> <span class="status-text">No carrier</span></p>
+        <svg class="wave" viewBox="0 0 1000 120" preserveAspectRatio="none"><path d="M0,60 L1000,60" /></svg>
+        <div class="meter">{bars.map(() => <span class="bar"></span>)}</div>
+      </div>
+
+      <ol class="stations">
+        {STATIONS.map((s, i) => (
+          <li class="station" data-index={i}>
+            <div class="st-head">
+              <p class="mono st-mask"><span class="st-in">0{i + 1} / 0{STATIONS.length} · {s.freq.toFixed(1)} MHz</span></p>
+              <h3 class="st-mask"><span class="st-in">{s.stage}</span></h3>
+              <p class="mono st-mask"><span class="st-in">{s.english}</span></p>
+            </div>
+            <p class="st-blurb st-mask"><span class="st-in">{s.blurb}</span></p>
+            <ul class="st-acts">
+              {s.acts.map((a) => (
+                <li class="st-mask">
+                  <span class="st-in act">
+                    <span class="act-name">{a.name}</span>
+                    <span class="mono act-meta">{a.time}{a.note && <em> · {a.note}</em>}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+        <li class="st-empty mono" aria-hidden="true">Between stations — keep scrolling</li>
+      </ol>
+    </div>
+
+    <div class="dial" aria-hidden="true">
+      <div class="dial-track">
+        <svg class="scale" width={width} height="90" viewBox={`0 0 ${width} 90`}>
+          {ticks.map((t) => (
+            <line x1={t.x} x2={t.x} y1={t.whole ? 30 : t.half ? 42 : 50} y2="70" />
+          ))}
+          {ticks.filter((t) => t.whole).map((t) => (
+            <text x={t.x} y="88" text-anchor="middle">{Math.round(t.f)}</text>
+          ))}
+          {STATIONS.map((s) => {
+            const x = (s.freq - BAND.min) * PX;
+            return (
+              <g class="marker">
+                <path d={`M${x - 6},4 L${x + 6},4 L${x},14 Z`} />
+                <text x={x + 10} y="14">{s.stage}</text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <span class="needle"></span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tuner { padding-block: 5rem 4rem; }
+  .tuner-body { padding-top: 2rem; }
+  .readout, .dial, .st-empty { display: none; }
+
+  /* ---------- static layout (mobile, reduced motion, no JS) ---------- */
+  .stations { display: grid; gap: 3rem; }
+  .station { display: grid; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+  .st-head h3 { font-size: clamp(4rem, 12vw, 10rem); line-height: 0.8; margin-block: 0.4rem 0.2rem; }
+  .st-blurb { max-width: 36ch; }
+  .st-acts { display: grid; }
+  .st-acts li { border-bottom: 1px solid var(--line); }
+  .act { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-block: 0.55rem; }
+  .act-name { font-family: var(--ff-display); font-weight: 700; text-transform: uppercase; font-size: clamp(1.6rem, 2.3vw, 2.6rem); line-height: 0.9; }
+  .act-meta em { font-style: normal; opacity: 0.7; }
+  .st-mask, .st-in { display: block; }
+  .st-in.act { display: flex; }
+
+  /* ---------- pinned scene (desktop + motion; class added by JS) ---------- */
+  .tuner.is-scene { padding: 0; }
+  .is-scene .tuner-stage { height: 100svh; display: grid; grid-template-rows: auto 1fr auto; padding-top: 4.5rem; }
+  .is-scene .tuner-body { display: grid; grid-template-columns: 7fr 5fr; gap: calc(var(--gutter) * 2); padding-top: 1rem; min-height: 0; }
+  .is-scene .readout { display: flex; flex-direction: column; justify-content: center; gap: 1.25rem; }
+  .freq { font-family: var(--ff-display); font-weight: 700; font-size: clamp(8rem, 21vw, 26rem); line-height: 0.72; letter-spacing: -0.02em; }
+  .unit { font-family: var(--ff-mono); font-weight: 400; font-size: 0.06em; letter-spacing: 0.04em; vertical-align: top; margin-left: 0.6rem; }
+  .status { display: flex; align-items: center; gap: 0.5rem; }
+  .status .dot { opacity: 0.25; transition: opacity 150ms; }
+  .tuner.is-locked .status .dot { opacity: 1; }
+  .wave { width: 100%; height: clamp(60px, 9vh, 110px); overflow: visible; }
+  .wave path { fill: none; stroke: currentColor; stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .meter { display: flex; gap: 4px; align-items: end; height: 26px; }
+  .bar { width: 10px; background: currentColor; opacity: 0.18; }
+  .bar.on { opacity: 1; }
+  .meter .bar:nth-child(n) { height: calc(30% + var(--h, 0%)); }
+
+  .is-scene .stations { position: relative; display: block; align-self: center; height: min(36rem, 100%); }
+  .is-scene .station { position: absolute; inset: 0; align-content: center; border-top: 0; padding: 0; visibility: hidden; }
+  .is-scene .st-mask { overflow: hidden; }
+  .is-scene .st-empty { display: grid; place-items: center; position: absolute; inset: 0; opacity: 0.45; }
+
+  .is-scene .dial { display: block; position: relative; height: 110px; margin-inline: calc(var(--gutter) * -1); overflow: hidden; border-top: 1px solid var(--line); }
+  .dial-track { position: absolute; left: 50%; top: 10px; will-change: transform; }
+  .scale { max-width: none; }
+  .scale line { stroke: currentColor; stroke-width: 1.5; }
+  .scale text { fill: currentColor; font-family: var(--ff-mono); font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .marker path { fill: currentColor; }
+  .needle { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: currentColor; }
+  .needle::before { content: ""; position: absolute; top: 0; left: -6px; border: 7px solid transparent; border-top-color: currentColor; }
+
+  @media (max-width: 1000px) { .hide-sm { display: none; } }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+  import { pinnedScene } from "../../scripts/pinned-scene";
+  import { STATIONS, BAND } from "../../data";
+
+  const { clamp, interpolate } = gsap.utils;
+  const ease = gsap.parseEase("power2.inOut");
+
+  // Progress → frequency: travel, hold on a station, travel, hold … then sweep out to the band edge.
+  const TRAVEL = 0.09;
+  const HOLD = (1 - TRAVEL * (STATIONS.length + 1)) / STATIONS.length;
+  const knots: [number, number][] = [[0, BAND.min]];
+  let p = 0;
+  for (const s of STATIONS) {
+    p += TRAVEL; knots.push([p, s.freq]);
+    p += HOLD; knots.push([p, s.freq]);
+  }
+  knots.push([1, BAND.max]);
+
+  const freqAt = (progress: number): number => {
+    for (let i = 1; i < knots.length; i++) {
+      const [p1, f1] = knots[i]!;
+      const [p0, f0] = knots[i - 1]!;
+      if (progress <= p1) return interpolate(f0, f1, ease(clamp(0, 1, (progress - p0) / (p1 - p0 || 1))));
+    }
+    return BAND.max;
+  };
+
+  onPage<HTMLElement>("[data-tuner]", (root, { mm, reduced }) => {
+    if (reduced) return;
+    mm.add("(min-width: 1001px)", () => {
+      root.classList.add("is-scene");
+      const px = Number(root.dataset.px ?? "150");
+      const track = root.querySelector<HTMLElement>(".dial-track");
+      const value = root.querySelector<HTMLElement>(".freq-value");
+      const statusText = root.querySelector<HTMLElement>(".status-text");
+      const path = root.querySelector<SVGPathElement>(".wave path");
+      const bars = Array.from(root.querySelectorAll<HTMLElement>(".bar"));
+      const stations = Array.from(root.querySelectorAll<HTMLElement>(".station"));
+      const empty = root.querySelector<HTMLElement>(".st-empty");
+      gsap.set(stations, { autoAlpha: 0 });
+
+      let freq: number = BAND.min;
+      let lock = 0;
+      let active = -1;
+
+      const show = (next: number): void => {
+        const prev = stations[active];
+        if (prev) {
+          gsap.to(prev.querySelectorAll(".st-in"), {
+            yPercent: -110, duration: 0.35, ease: "power2.in", stagger: 0.02, overwrite: true,
+            onComplete: () => { gsap.set(prev, { autoAlpha: 0 }); },
+          });
+        }
+        active = next;
+        const cur = stations[next];
+        if (empty) gsap.to(empty, { autoAlpha: cur ? 0 : 0.45, duration: 0.2, delay: cur ? 0 : 0.3 });
+        if (cur) {
+          gsap.set(cur, { autoAlpha: 1 });
+          gsap.fromTo(cur.querySelectorAll(".st-in"), { yPercent: 110 }, {
+            yPercent: 0, duration: 0.9, ease: "power4.out", stagger: 0.05, delay: 0.2, overwrite: true,
+          });
+        }
+        if (statusText) statusText.textContent = cur ? `Locked · ${STATIONS[next]?.stage ?? ""}` : "No carrier";
+        root.classList.toggle("is-locked", Boolean(cur));
+      };
+
+      // Waveform + meter: a clean sine when locked, noise when not. Runs only while pinned.
+      let t = 0;
+      const draw = (): void => {
+        t += 0.06;
+        if (path) {
+          let d = "";
+          for (let i = 0; i <= 120; i++) {
+            const x = (i / 120) * 1000;
+            const sine = Math.sin(i * 0.32 + t * 3) * 42 * lock;
+            const noise = (Math.random() - 0.5) * 80 * (1 - lock);
+            d += `${i ? "L" : "M"}${x.toFixed(1)},${(60 + sine + noise).toFixed(1)}`;
+          }
+          path.setAttribute("d", d);
+        }
+        const lit = Math.round(lock * bars.length);
+        bars.forEach((b, i) => {
+          const flicker = lock < 0.9 && Math.random() < 0.15;
+          b.classList.toggle("on", i < lit !== flicker);
+          b.style.setProperty("--h", `${(i / bars.length) * 70}%`);
+        });
+      };
+
+      pinnedScene(root, {
+        viewports: 6,
+        onToggle: (self) => {
+          if (self.isActive) gsap.ticker.add(draw);
+          else gsap.ticker.remove(draw);
+        },
+        render(progress) {
+          freq = freqAt(progress);
+          const nearest = STATIONS.reduce((best, s, i) =>
+            Math.abs(s.freq - freq) < Math.abs((STATIONS[best]?.freq ?? 0) - freq) ? i : best, 0);
+          const dist = Math.abs((STATIONS[nearest]?.freq ?? 0) - freq);
+          lock = clamp(0, 1, 1 - dist / 0.6);
+          if (track) gsap.set(track, { x: -(freq - BAND.min) * px });
+          if (value) value.textContent = freq.toFixed(1);
+          const next = dist < 0.05 ? nearest : -1;
+          if (next !== active) show(next);
+        },
+      });
+      draw();
+
+      return () => {
+        gsap.ticker.remove(draw);
+        root.classList.remove("is-scene", "is-locked");
+      };
+    });
+  });
+</script>

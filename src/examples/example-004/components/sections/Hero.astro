@@ -1,0 +1,75 @@
+---
+import { Image } from "astro:assets";
+import { HERO, EXHIBITION } from "../../data";
+---
+<section class="hero" id="top">
+  <div class="container">
+    <div class="hero-top label-row">
+      <p class="label reveal-fade">[ Galeri fotografi ]</p>
+      <p class="label reveal-fade hide-sm">Jl. Braga 61, Bandung</p>
+      <p class="label reveal-fade" data-status>Open Tue — Sun</p>
+    </div>
+
+    <h1 class="headline" aria-label="What light leaves behind">
+      <span class="hl"><span class="hl-in">What light</span></span>
+      <span class="hl row2">
+        <span class="inset reveal-clip"><Image src={HERO.img} alt={HERO.alt} widths={[400, 800, 1200]} sizes="(max-width: 1000px) 30vw, 18vw" loading="eager" fetchpriority="high" /></span>
+        <span class="hl-in">leaves</span>
+      </span>
+      <span class="hl right"><span class="hl-in">behind.</span></span>
+    </h1>
+
+    <div class="hero-foot cols">
+      <p class="intro reveal-fade">Bayang is a gallery for photography and print on Jalan Braga. Free entry, six days a week, in a 1930s bank hall we keep almost empty on purpose.</p>
+      <div class="now reveal-fade">
+        <p class="label muted">Now showing</p>
+        <p class="now-title"><em>{EXHIBITION.title}</em> — {EXHIBITION.english}</p>
+        <p class="label">{EXHIBITION.dates}</p>
+      </div>
+      <a href="#now" class="btn reveal-fade cta">See the exhibition <span aria-hidden="true">↓</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero { min-height: 100svh; padding-top: 4.2rem; display: flex; }
+  .hero > .container { display: flex; flex-direction: column; }
+  .headline { display: grid; margin-block: auto; padding-block: 3rem 2.5rem; font-size: clamp(3.75rem, 13.2vw, 21rem); line-height: 0.86; }
+  .hl { display: block; overflow: hidden; padding: 0.08em 0.04em 0.1em; margin: -0.08em -0.04em -0.1em; }
+  .hl-in { display: inline-block; }
+  :global(html.js-motion) .hl-in { visibility: hidden; }
+  .row2 { display: flex; align-items: center; gap: 0.18em; padding-left: 0.9em; }
+  .right { text-align: right; }
+  .right .hl-in { font-style: italic; }
+  .inset { display: inline-block; width: 1.05em; height: 0.78em; overflow: hidden; }
+  .hero-foot { align-items: end; padding-bottom: 1.5rem; row-gap: 1.5rem; }
+  .intro { grid-column: 1 / span 4; max-width: 34ch; }
+  .now { grid-column: 7 / span 3; display: grid; gap: 0.35rem; }
+  .now-title { font-family: var(--ff-display); font-size: 1.6rem; line-height: 1.05; letter-spacing: -0.01em; font-weight: 400; }
+  .cta { grid-column: 11 / span 2; justify-self: end; }
+
+  @media (max-width: 1000px) {
+    .hide-sm { display: none; }
+    .headline { font-size: 17.5vw; padding-block: 2.5rem 2rem; }
+    .row2 { padding-left: 0; }
+    .inset { width: 1.15em; height: 0.82em; }
+    .cta { justify-self: start; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+  import { introDone } from "../../scripts/preloader";
+  // Headline lines rise out of their own masks once the iris has opened.
+  onPage<HTMLElement>(".hero", (root, { ctx, reduced }) => {
+    const lines = root.querySelectorAll<HTMLElement>(".hl-in");
+    if (reduced) return;
+    gsap.set(lines, { yPercent: 110, visibility: "visible" });
+    void Promise.all([introDone, document.fonts.ready]).then(() => {
+      ctx.add(() => {
+        gsap.to(lines, { yPercent: 0, duration: 1.3, ease: "power4.out", stagger: 0.12, delay: 0.05 });
+      });
+    });
+  });
+</script>

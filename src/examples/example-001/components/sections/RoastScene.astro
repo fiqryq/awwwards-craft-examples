@@ -1,0 +1,190 @@
+---
+import { curvePath, rorPath, x, y, W, H, PHASES, DROP, FIRST_CRACK } from "../../lib/curve.js";
+const bt = curvePath(3);
+const ror = rorPath(5);
+const bands = PHASES.slice(1, 5).map((p, i, arr) => ({ ...p, end: arr[i + 1]?.start ?? DROP }));
+---
+<section id="roast" class="roast invert" data-roast data-nav-dark>
+  <div class="roast-pin">
+    <div class="container roast-inner">
+      <header class="roast-head">
+        <p class="mono bracket">The roast</p>
+        <h2 class="roast-title" data-copy="lines">Ten minutes.<br />Every second logged.</h2>
+      </header>
+
+      <div class="roast-grid">
+        <div class="roast-side">
+          <div class="phase-index mono"><span class="phase-num tnum">01</span> / 06</div>
+          <div class="phase-names" aria-live="polite">
+            {PHASES.map((p, i) => <h3 class={`phase-name${i === 0 ? " is-active" : ""}`} data-i={i}>{p.label}</h3>)}
+          </div>
+          <div class="phase-notes">
+            {PHASES.map((p, i) => <p class={`phase-note${i === 0 ? " is-active" : ""}`} data-i={i} data-label={p.label}>{p.note}</p>)}
+          </div>
+          <dl class="readouts">
+            <div><dt class="mono">Bean temp</dt><dd class="tnum" data-bt>200.0°</dd></div>
+            <div><dt class="mono">RoR °/min</dt><dd class="tnum" data-ror>—</dd></div>
+            <div><dt class="mono">Elapsed</dt><dd class="tnum" data-time>00:00</dd></div>
+          </dl>
+        </div>
+
+        <figure class="chart">
+          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-label="Bean temperature curve from charge at 200 degrees to drop at 213 degrees after 10 minutes 30 seconds">
+            <defs>
+              <clipPath id="roast-clip"><rect class="clip-rect" x="0" y="0" width={W} height={H} /></clipPath>
+            </defs>
+            {bands.map((b, i) => (
+              <rect x={x(b.start)} y="0" width={x(b.end) - x(b.start)} height={H} class={`band band-${i % 2}`} />
+            ))}
+            {[100, 130, 160, 190, 220].map((t) => <line x1="0" x2={W} y1={y(t)} y2={y(t)} class="grid" />)}
+            <line x1={x(FIRST_CRACK)} x2={x(FIRST_CRACK)} y1="0" y2={H} class="fc" />
+            <path d={bt} class="bt ghost" />
+            <g clip-path="url(#roast-clip)">
+              <path d={ror} class="ror" />
+              <path d={bt} class="bt" />
+            </g>
+          </svg>
+          <span class="dot" aria-hidden="true"></span>
+          <div class="axis mono" aria-hidden="true">
+            {[0, 2, 4, 6, 8, 10].map((m) => <span style={`left:${(m * 60 / DROP) * 100}%`}>{m}:00</span>)}
+          </div>
+          <div class="temps mono" aria-hidden="true">
+            {[100, 160, 220].map((t) => <span style={`top:${(y(t) / H) * 100}%`}>{t}°</span>)}
+          </div>
+          <div class="band-labels mono" aria-hidden="true">
+            {bands.filter((b) => b.id !== "crack").map((b) => (
+              <span style={`left:${(x(b.start) / W) * 100}%`}>
+                <span class="full">{b.label}</span><span class="short">{b.id === "development" ? "Dev." : b.label}</span>
+              </span>
+            ))}
+            <span class="fc-label" style={`left:${(x(FIRST_CRACK) / W) * 100}%`}>1st crack · 204.5°</span>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .roast { overflow: clip; }
+  .roast-pin { min-height: 100svh; padding-block: 6rem 3rem; display: flex; }
+  .roast-inner { display: flex; flex-direction: column; gap: 3rem; width: 100%; }
+  .roast-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; }
+  .roast-title { font-size: clamp(2.5rem, 5.5vw, 8rem); text-align: right; }
+  .roast-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); flex: 1; align-items: stretch; }
+  .roast-side { grid-column: 1 / span 4; display: flex; flex-direction: column; gap: 1.25rem; }
+  .phase-names { position: relative; height: clamp(2.2rem, 4.2vw, 5.4rem); overflow: hidden; }
+  .phase-name { position: absolute; inset: 0; font-size: clamp(2rem, 4vw, 5rem); white-space: nowrap; transform: translateY(105%); }
+  .phase-name.is-active { transform: none; }
+  .phase-notes { position: relative; min-height: 5.5em; }
+  .phase-note { position: absolute; inset: 0; opacity: 0; max-width: 34ch; }
+  .phase-note.is-active { opacity: 1; }
+  .readouts { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid color-mix(in oklab, var(--paper) 25%, transparent); }
+  .readouts > div { padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .readouts dd { font-family: var(--ff-display); font-weight: 800; font-size: clamp(1.75rem, 3vw, 3.5rem); letter-spacing: -0.03em; line-height: 1; }
+
+  .chart { grid-column: 6 / -1; position: relative; min-height: 340px; }
+  .chart svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .band-0 { fill: color-mix(in oklab, var(--paper) 6%, transparent); }
+  .band-1 { fill: transparent; }
+  .grid { stroke: color-mix(in oklab, var(--paper) 14%, transparent); vector-effect: non-scaling-stroke; }
+  .fc { stroke: var(--paper); stroke-dasharray: 4 6; opacity: 0.5; vector-effect: non-scaling-stroke; }
+  .bt { fill: none; stroke: var(--paper); stroke-width: 3; vector-effect: non-scaling-stroke; }
+  .bt.ghost { opacity: 0.15; stroke-dasharray: 2 6; }
+  .ror { fill: none; stroke: color-mix(in oklab, var(--paper) 55%, transparent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .dot {
+    position: absolute; left: 0; top: 0; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+    background: var(--paper); box-shadow: 0 0 0 6px color-mix(in oklab, var(--paper) 20%, transparent);
+    display: none;
+  }
+  .axis, .temps, .band-labels { position: absolute; inset: 0; pointer-events: none; }
+  .axis span { position: absolute; bottom: -1.75rem; transform: translateX(-50%); }
+  .axis span:first-child { transform: none; }
+  .temps span { position: absolute; left: -3.25rem; transform: translateY(-50%); }
+  .band-labels > span { position: absolute; top: 0.5rem; padding-left: 0.5rem; }
+  .band-labels .short { display: none; }
+  .band-labels .fc-label { top: auto; bottom: 0.5rem; transform: translateX(-100%); padding: 0 0.5rem 0 0; white-space: nowrap; }
+
+  /* desktop + motion: the pinned, scroll-drawn version */
+  :global(html.js-motion) .roast[data-live] .dot { display: block; }
+
+  @media (max-width: 1000px) {
+    .roast-pin { padding-block: 5rem 4rem; }
+    .roast-head { flex-direction: column; align-items: flex-start; }
+    .roast-title { text-align: left; }
+    .roast-side, .chart { grid-column: 1 / -1; }
+    .chart { min-height: 260px; margin: 2rem 0 2.5rem 2.5rem; order: -1; }
+    .roast-grid { row-gap: 1rem; }
+    /* static: show every phase as a list */
+    .phase-index, .readouts { display: none; }
+    .phase-names, .phase-notes { height: auto; min-height: 0; overflow: visible; }
+    .phase-name, .phase-note { position: static; transform: none; opacity: 1; }
+    .phase-names { display: none; }
+    .phase-notes { display: grid; gap: 0.9rem; }
+    .phase-note { max-width: none; padding-top: 0.9rem; border-top: 1px solid color-mix(in oklab, var(--paper) 22%, transparent); }
+    .phase-note::before { content: attr(data-label); display: block; font-family: var(--ff-display); font-weight: 800; font-size: 1.6rem; letter-spacing: -0.03em; margin-bottom: 0.35rem; }
+    .band-labels .short { display: none; }
+  .band-labels .fc-label { display: none; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap.js";
+  import { onPage } from "../../scripts/lifecycle.js";
+  import { pinnedScene } from "../../scripts/pinned-scene.js";
+  import { beanTemp, rateOfRise, x, y, W, H, DROP, PHASES, fmtTime } from "../../lib/curve.js";
+
+  onPage("[data-roast]", (root, { mm, reduced }) => {
+    if (reduced) return; // static full curve is the reduced-motion version
+
+    mm.add("(min-width: 1001px)", () => {
+      root.setAttribute("data-live", "");
+      const clip = root.querySelector(".clip-rect");
+      const dot = root.querySelector(".dot");
+      const chart = root.querySelector(".chart");
+      const names = [...root.querySelectorAll(".phase-name")];
+      const notes = [...root.querySelectorAll(".phase-note")];
+      const num = root.querySelector(".phase-num");
+      const btEl = root.querySelector("[data-bt]");
+      const rorEl = root.querySelector("[data-ror]");
+      const timeEl = root.querySelector("[data-time]");
+      let current = 0;
+
+      const showPhase = (i) => {
+        if (i === current) return;
+        const down = i > current;
+        gsap.to(names[current], { yPercent: down ? -105 : 105, duration: 0.5, ease: "power3.in", overwrite: true });
+        gsap.fromTo(names[i], { y: 0, yPercent: down ? 105 : -105 }, { yPercent: 0, duration: 0.8, ease: "power4.out", overwrite: true, delay: 0.1 });
+        gsap.to(notes[current], { opacity: 0, duration: 0.25, overwrite: true });
+        gsap.to(notes[i], { opacity: 1, duration: 0.6, delay: 0.2, overwrite: true });
+        num.textContent = String(i + 1).padStart(2, "0");
+        current = i;
+      };
+      // y: 0 clears the CSS translateY start state, which GSAP would otherwise read as pixels
+      gsap.set(names, { y: 0, yPercent: (i) => (i === 0 ? 0 : 105) });
+      names.forEach((n) => n.classList.remove("is-active"));
+      notes.forEach((n, i) => gsap.set(n, { opacity: i === 0 ? 1 : 0 }));
+
+      pinnedScene(root.querySelector(".roast-pin"), {
+        viewports: 4,
+        scrub: 1,
+        render(p) {
+          // hold 8% at charge and 8% at drop so the scene breathes at both ends
+          const t = gsap.utils.clamp(0, 1, (p - 0.08) / 0.84) * DROP;
+          const temp = beanTemp(t);
+          clip.setAttribute("width", String(x(t)));
+          const r = chart.getBoundingClientRect();
+          gsap.set(dot, { x: (x(t) / W) * r.width, y: (y(temp) / H) * r.height });
+          btEl.textContent = `${temp.toFixed(1)}°`;
+          rorEl.textContent = t > 75 ? rateOfRise(t).toFixed(1) : "—";
+          timeEl.textContent = fmtTime(t);
+          let i = 0;
+          PHASES.forEach((ph, k) => { if (t >= ph.start) i = k; });
+          showPhase(i);
+        },
+      });
+
+      return () => { root.removeAttribute("data-live"); clip.setAttribute("width", String(W)); };
+    });
+  });
+</script>

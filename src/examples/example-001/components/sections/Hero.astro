@@ -1,0 +1,134 @@
+---
+import { curvePath, rorPath, x, y, W, H, FIRST_CRACK } from "../../lib/curve.js";
+const bt = curvePath();
+const ror = rorPath();
+const batches = [
+  { id: "#1042", name: "Ethiopia Guji, washed", w: "12.0 kg", state: "Roasting" },
+  { id: "#1041", name: "Colombia Huila, honey", w: "10.5 kg", state: "Cooling" },
+  { id: "#1040", name: "Java Frinsa, natural", w: "12.0 kg", state: "Done" },
+  { id: "#1039", name: "House espresso", w: "15.0 kg", state: "Done" },
+];
+---
+<section class="hero" data-hero>
+  <div class="container hero-inner">
+    <div class="hero-top">
+      <p class="mono bracket reveal-fade">Roast management software</p>
+      <p class="mono reveal-fade">For roasters from 1 to 30 kg</p>
+    </div>
+
+    <h1 class="hero-title" data-copy="chars" data-copy-manual>Roast by<br />the curve.</h1>
+
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="lg reveal-fade">Log every batch live, plan production, track green stock and cup with your team — in one calm place built by roasters.</p>
+        <div class="hero-cta reveal-fade">
+          <a href="#trial" class="btn" data-magnetic><span>Start 14-day trial <span class="arrow" aria-hidden="true">→</span></span></a>
+          <a href="#roast" class="btn ghost">See a roast</a>
+        </div>
+      </div>
+
+      <figure class="hero-ui reveal-clip" aria-label="Firstcrack dashboard showing a live roast curve for batch 1042">
+        <div class="ui-bar">
+          <span class="mono">Batch #1042 · Ethiopia Guji · 12.0 kg</span>
+          <span class="live mono"><i></i> Live</span>
+        </div>
+        <div class="ui-body">
+          <div class="ui-readouts">
+            <div><span class="mono">Bean temp</span><strong class="tnum">198.4°</strong></div>
+            <div><span class="mono">RoR</span><strong class="tnum">8.9</strong></div>
+            <div><span class="mono">Elapsed</span><strong class="tnum">08:12</strong></div>
+            <div><span class="mono">Phase</span><strong>Maillard</strong></div>
+          </div>
+          <svg class="ui-chart" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
+            {[120, 160, 200].map((t) => <line x1="0" x2={W} y1={y(t)} y2={y(t)} class="grid" />)}
+            <line x1={x(FIRST_CRACK)} x2={x(FIRST_CRACK)} y1="0" y2={H} class="fc" />
+            <path d={ror} class="ror" />
+            <path d={bt} class="bt" />
+          </svg>
+          <ul class="ui-list">
+            {batches.map((b) => (
+              <li>
+                <span class="mono">{b.id}</span>
+                <span class="name">{b.name}</span>
+                <span class="mono">{b.w}</span>
+                <span class={`mono state ${b.state.toLowerCase()}`}>{b.state}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </figure>
+    </div>
+  </div>
+
+  <div class="section-footer">
+    <p class="mono">Est. Bandung, 2021</p>
+    <p class="mono scroll-hint">Scroll to charge ↓</p>
+    <p class="mono">340 roasteries · 1.2M batches logged</p>
+  </div>
+</section>
+
+<style>
+  .hero { min-height: 100svh; padding-top: 6rem; padding-bottom: 5rem; overflow: clip; }
+  .hero-inner { display: flex; flex-direction: column; gap: 1.5rem; }
+  .hero-top { display: flex; justify-content: space-between; border-bottom: 1px solid color-mix(in oklab, var(--ink) 30%, transparent); padding-bottom: 1rem; }
+  .hero-title { margin-left: -0.05em; font-size: clamp(3.5rem, 9.6vw, 16rem); }
+  .hero-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: end; }
+  .hero-copy { grid-column: 1 / span 5; display: flex; flex-direction: column; gap: 2rem; padding-bottom: 0.5rem; color: var(--deep); }
+  .hero-cta { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .hero-ui { grid-column: 7 / -1; margin-top: -7vw; }
+
+  .hero-ui {
+    background: var(--ink); color: var(--paper); border-radius: 14px; overflow: hidden;
+    box-shadow: 0 40px 80px -40px color-mix(in oklab, var(--ink) 60%, transparent);
+  }
+  .ui-bar { display: flex; justify-content: space-between; padding: 0.9rem 1.1rem; border-bottom: 1px solid color-mix(in oklab, var(--paper) 18%, transparent); }
+  .live { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .live i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #fdf2de; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.25; } }
+  .ui-body { display: grid; grid-template-columns: 1fr; }
+  .ui-readouts { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid color-mix(in oklab, var(--paper) 18%, transparent); }
+  .ui-readouts > div { display: flex; flex-direction: column; gap: 0.4rem; padding: 0.9rem 1.1rem; border-right: 1px solid color-mix(in oklab, var(--paper) 18%, transparent); }
+  .ui-readouts > div:last-child { border-right: 0; }
+  .ui-readouts strong { font-family: var(--ff-display); font-size: clamp(1.4rem, 2.2vw, 2.4rem); letter-spacing: -0.03em; line-height: 1; }
+  .ui-readouts .mono { opacity: 1; }
+  .ui-chart { width: 100%; height: clamp(150px, 13vw, 260px); }
+  .grid { stroke: color-mix(in oklab, var(--paper) 14%, transparent); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .fc { stroke: var(--paper); stroke-dasharray: 4 6; stroke-width: 1; opacity: 0.6; vector-effect: non-scaling-stroke; }
+  .bt { fill: none; stroke: var(--paper); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+  .ror { fill: none; stroke: color-mix(in oklab, var(--paper) 50%, transparent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .ui-list li {
+    display: grid; grid-template-columns: 4rem 1fr 5rem 5.5rem; gap: 1rem; align-items: center;
+    padding: 0.7rem 1.1rem; border-top: 1px solid color-mix(in oklab, var(--paper) 12%, transparent); font-size: 0.9rem;
+  }
+  .state { text-align: right; }
+  .state.roasting { opacity: 1; }
+
+  .section-footer {
+    position: absolute; inset-inline: 0; bottom: 0;
+    display: flex; justify-content: space-between; padding: 1.25rem var(--gutter);
+  }
+
+  @media (max-width: 1000px) {
+    .hero { padding-bottom: 4rem; }
+    .hero-title { font-size: 18vw; }
+    .hero-top p:last-child { display: none; }
+    .hero-copy, .hero-ui { grid-column: 1 / -1; }
+    .hero-ui { margin-top: 2.5rem; }
+    .ui-readouts { grid-template-columns: repeat(2, 1fr); }
+    .ui-readouts > div:nth-child(2) { border-right: 0; }
+    .ui-readouts > div:nth-child(-n + 2) { border-bottom: 1px solid color-mix(in oklab, var(--paper) 18%, transparent); }
+    .ui-list li { grid-template-columns: 3.5rem 1fr auto; }
+    .ui-list li > :nth-child(3) { display: none; }
+    .section-footer p:not(.scroll-hint) { display: none; }
+    .section-footer { justify-content: center; }
+  }
+</style>
+
+<script>
+  import { onPage } from "../../scripts/lifecycle.js";
+  import { magnetic } from "../../scripts/magnetic.js";
+  onPage("[data-hero]", (root) => {
+    const offs = [...root.querySelectorAll("[data-magnetic]")].map((el) => magnetic(el));
+    return () => offs.forEach((off) => off());
+  });
+</script>

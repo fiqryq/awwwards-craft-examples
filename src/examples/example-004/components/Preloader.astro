@@ -1,0 +1,29 @@
+<div class="preloader" aria-hidden="true">
+  <div class="pre-top">
+    <p class="label">Bayang — galeri fotografi</p>
+    <p class="label">Bandung</p>
+  </div>
+  <svg class="mark" viewBox="0 0 120 120">
+    <path class="mark-frame" d="M4 4 H116 V116 H4 Z" />
+    <circle class="mark-dot" cx="60" cy="60" r="30" />
+  </svg>
+  <div class="pre-bottom">
+    <p class="label">Developing</p>
+    <p class="label pre-count">000</p>
+  </div>
+  <div class="pre-iris"></div>
+</div>
+
+<style>
+  .preloader {
+    position: fixed; inset: 0; z-index: 100; display: none;
+    flex-direction: column; justify-content: space-between; padding: var(--gutter);
+    background: var(--ink); color: var(--paper);
+  }
+  :global(html.js-motion.first-visit) .preloader { display: flex; }
+  .pre-top, .pre-bottom { display: flex; justify-content: space-between; }
+  .mark { position: absolute; left: 50%; top: 50%; width: clamp(110px, 14vw, 180px); translate: -50% -50%; overflow: visible; }
+  .mark-frame { fill: none; stroke: currentColor; stroke-width: 2; }
+  .mark-dot { fill: currentColor; opacity: 0; } /* scale start is set by GSAP (SVG transform origin) */
+  .pre-iris { position: absolute; inset: 0; background: var(--paper); clip-path: circle(0px at 50% 50%); }
+</style>

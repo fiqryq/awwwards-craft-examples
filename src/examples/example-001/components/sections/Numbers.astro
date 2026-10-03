@@ -1,0 +1,22 @@
+---
+const stats = [
+  { v: 1.2, d: 1, suffix: "M", label: "Batches logged since 2021" },
+  { v: 31, d: 0, suffix: "%", label: "Less green coffee written off, on average" },
+  { v: 4.5, d: 1, suffix: "h", label: "Saved per week on production planning" },
+];
+---
+<section class="numbers container" data-numbers>
+  {stats.map((s) => (
+    <div class="stat">
+      <p class="value"><span class="tnum" data-count={s.v} data-decimals={s.d}>{s.v.toFixed(s.d)}</span>{s.suffix}</p>
+      <p class="mono">{s.label}</p>
+    </div>
+  ))}
+</section>
+
+<style>
+  .numbers { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); padding-block: 4rem 8rem; }
+  .stat { display: flex; flex-direction: column; gap: 1rem; padding-top: 1.25rem; border-top: 1px solid color-mix(in oklab, var(--ink) 30%, transparent); }
+  .value { font-family: var(--ff-display); font-weight: 800; font-size: clamp(4rem, 10vw, 12rem); letter-spacing: -0.05em; line-height: 0.85; }
+  @media (max-width: 1000px) { .numbers { grid-template-columns: 1fr; padding-block: 2rem 5rem; } }
+</style>

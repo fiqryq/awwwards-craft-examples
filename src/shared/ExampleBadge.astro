@@ -1,0 +1,44 @@
+---
+// Small fixed chip on every example linking back to the gallery. Self-styled so it never
+// depends on (or leaks into) an example's own tokens.
+interface Props {
+  n: string;
+}
+const { n } = Astro.props;
+---
+<a href="/" class="example-badge" aria-label={`Back to all examples (this is example ${n})`}>
+  <span aria-hidden="true">←</span>
+  <span class="label">Examples</span>
+  <span class="num">{n}</span>
+</a>
+
+<style>
+  /* Desktop: an 8px sliver on the left edge that slides out on hover/focus, so it never covers
+     an example's own gutter content. Mobile: a small pill in the bottom-right corner. */
+  .example-badge {
+    position: fixed; left: 0; top: 50%; z-index: 90;
+    display: inline-flex; align-items: center; gap: 8px;
+    writing-mode: vertical-rl; rotate: 180deg;
+    translate: calc(-100% + 8px) -50%;
+    padding: 12px 8px; border-radius: 8px 0 0 8px;
+    background: #111; color: #f4f4f4; text-decoration: none;
+    font: 500 11px/1 ui-monospace, "SFMono-Regular", Menlo, monospace;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    box-shadow: 0 2px 12px rgb(0 0 0 / 0.18);
+    transition: translate 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .example-badge:hover, .example-badge:focus-visible { translate: 0 -50%; }
+  .num { padding: 6px 3px; border-radius: 999px; background: #f4f4f4; color: #111; }
+  :global(html.first-visit.js-motion) .example-badge { opacity: 0; }
+  .example-badge:focus-visible { outline: 2px solid #f4f4f4; outline-offset: 2px; }
+  @media (max-width: 1000px) {
+    .example-badge {
+      top: auto; left: auto; right: 10px; bottom: 10px; writing-mode: horizontal-tb; rotate: none; translate: none;
+      border-radius: 999px; padding: 6px 6px 6px 10px;
+    }
+    .example-badge:hover, .example-badge:focus-visible { translate: none; }
+    .num { padding: 3px 6px; }
+    .label { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .example-badge { transition: none; } }
+</style>

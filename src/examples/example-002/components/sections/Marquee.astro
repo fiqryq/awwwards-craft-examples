@@ -1,0 +1,36 @@
+---
+import { MARQUEE } from "../../data";
+const items = [...MARQUEE, ...MARQUEE];
+---
+<section class="ticker invert" aria-label="Featured artists" data-nav-dark>
+  <div class="marquee" data-speed="40" data-scroll-reactive>
+    <div class="marquee-track">
+      {items.map((name, i) => (
+        <span class="marquee-item" aria-hidden={i >= MARQUEE.length ? "true" : undefined}>
+          {name}<span class="sep" aria-hidden="true">✳</span>
+        </span>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .ticker { padding-block: 1.25rem; overflow: clip; }
+  .marquee { overflow: hidden; }
+  .marquee-track { display: flex; width: max-content; }
+  .marquee-item {
+    display: inline-flex; align-items: center; gap: 2.5rem; padding-right: 2.5rem; white-space: nowrap;
+    font-family: var(--ff-display); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(3rem, 7vw, 8rem); line-height: 0.9;
+  }
+  .sep { font-size: 0.5em; }
+</style>
+
+<script>
+  import { onPage } from "../../scripts/lifecycle";
+  import { marquee } from "../../scripts/marquee";
+  onPage(".ticker .marquee", (root, { reduced }) => {
+    if (reduced) return;
+    return marquee(root);
+  });
+</script>

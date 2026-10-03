@@ -1,0 +1,75 @@
+---
+const cols = [
+  { h: "Festival", links: ["Line-up", "Stages", "Passes", "Accessibility"] },
+  { h: "Broadcast", links: ["98.3 FM live", "Archive sets", "Newsletter"] },
+  { h: "Follow", links: ["Instagram", "Telegram", "SoundCloud"] },
+];
+---
+<footer class="footer" data-nav-dark>
+  <div class="container">
+    <div class="cta">
+      <p class="mono">Phase 2 closes 30.09 or when it sells out</p>
+      <h2 data-copy="lines">Don't miss<br />the signal</h2>
+      <a href="#passes" class="btn">Get passes <span aria-hidden="true">→</span></a>
+    </div>
+
+    <div class="cols links">
+      {cols.map((c) => (
+        <div class="col">
+          <p class="mono h">{c.h}</p>
+          <ul>{c.links.map((l) => <li><a href="#top" class="link">{l}</a></li>)}</ul>
+        </div>
+      ))}
+      <div class="col clock">
+        <p class="mono h">Harbour time</p>
+        <p class="tnum time" data-clock="Asia/Jakarta">--:--:--</p>
+        <p class="mono">WIB · UTC+7</p>
+      </div>
+    </div>
+
+    <p class="wordmark" aria-hidden="true" data-wordmark>{"SINYAL".split("").map((c) => <span>{c}</span>)}</p>
+    <div class="legal">
+      <p class="mono">© 2026 Sinyal Festival — a fictional example</p>
+      <a href="#top" class="mono">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--ink); color: var(--paper); padding-top: 6rem; overflow: clip; --line: color-mix(in oklab, var(--paper) 30%, transparent); }
+  .cta { display: grid; justify-items: start; gap: 1.5rem; padding-bottom: 5rem; }
+  .cta .btn { background: var(--paper); color: var(--ink); }
+  .cta .btn::before { background: #fff; }
+  .links { padding-block: 2rem; border-top: 1px solid var(--line); row-gap: 2rem; }
+  .col { grid-column: span 3; display: grid; align-content: start; gap: 0.6rem; }
+  .h { opacity: 0.7; }
+  .col ul { display: grid; gap: 0.3rem; }
+  .link { font-size: 1.1rem; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size 350ms var(--ease-out); }
+  .link:hover { background-size: 100% 1px; }
+  .time { font-family: var(--ff-display); font-weight: 700; font-size: 3.5rem; line-height: 0.85; }
+  .wordmark {
+    display: flex; justify-content: space-between;
+    font-family: var(--ff-display); font-weight: 700; font-size: 35vw; line-height: 0.72; margin-top: 2rem;
+    margin-inline: -0.02em;
+  }
+  .wordmark { overflow: clip; padding-top: 0.04em; }
+  .wordmark span { display: block; }
+  .legal { display: flex; justify-content: space-between; padding-block: 1.25rem 4rem; }
+
+  @media (max-width: 1000px) {
+    .col { grid-column: span 6 !important; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+  // Wordmark letters rise from the center as the footer arrives.
+  onPage<HTMLElement>("[data-wordmark]", (root, { reduced }) => {
+    if (reduced) return;
+    gsap.from(root.children, {
+      yPercent: 100, duration: 1, ease: "power4.out", stagger: { each: 0.06, from: "center" },
+      scrollTrigger: { trigger: root, start: "top 95%", once: true },
+    });
+  });
+</script>

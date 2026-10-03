@@ -1,0 +1,163 @@
+---
+const modules = [
+  {
+    n: "01", title: "Roast profiles", lead: "Plug in your probes and every batch logs itself.",
+    points: ["Live bean & environment temp, RoR and gas", "Background curves to roast against", "Auto-detect turning point, yellowing and first crack", "Works with Diedrich, Giesen, Probat, Loring and Artisan exports"],
+    ui: "profiles",
+  },
+  {
+    n: "02", title: "Green inventory", lead: "Know what's in the warehouse before the importer calls.",
+    points: ["Lots, bags and moisture readings per arrival", "Stock drawn down automatically by each roast", "Shrinkage tracked per profile", "Reorder alerts by weeks of cover"],
+    ui: "inventory",
+  },
+  {
+    n: "03", title: "Production planner", lead: "Turn this week's orders into a roast schedule.",
+    points: ["Wholesale and webshop orders in one queue", "Batch sizes suggested from drum capacity", "Drag-and-drop roast days", "Packing lists printed per customer"],
+    ui: "planner",
+  },
+  {
+    n: "04", title: "Cupping & QC", lead: "Taste together, decide with data.",
+    points: ["SCA and custom score sheets on any phone", "Blind sessions with randomized codes", "Scores linked back to the exact roast curve", "Colour and moisture readings per batch"],
+    ui: "cupping",
+  },
+];
+const lots = [["Guji Hambela", "Washed", "412 kg", 82], ["Huila La Plata", "Honey", "186 kg", 45], ["Frinsa Manglayang", "Natural", "64 kg", 14], ["Santos Bourbon", "Pulped", "903 kg", 100]];
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+const plan = [[2, 3, 0, 1, 2], [1, 0, 3, 2, 0], [0, 2, 1, 0, 3]];
+const scores = [["Fragrance", 8.25], ["Flavor", 8.5], ["Acidity", 8.0], ["Body", 7.75], ["Balance", 8.25], ["Aftertaste", 8.0]];
+---
+<section id="modules" class="modules">
+  <div class="container modules-head cols">
+    <p class="mono bracket head-label">Modules</p>
+    <h2 class="head-title" data-copy="lines">One roastery.<br />Four calm tools.</h2>
+  </div>
+
+  <div class="container stack" data-stack>
+    {modules.map((m, i) => (
+      <article class={`card card-${i % 2 ? "ink" : "paper"}`} style={`--i:${i}`}>
+        <div class="card-copy">
+          <p class="mono">{m.n} / 04</p>
+          <h3>{m.title}</h3>
+          <p class="lg lead">{m.lead}</p>
+          <ul class="points">{m.points.map((pt) => <li>{pt}</li>)}</ul>
+        </div>
+        <div class="card-ui" aria-hidden="true">
+          {m.ui === "profiles" && (
+            <div class="ui-profiles">
+              {["Guji v14 — filter", "House espresso v9", "Huila honey v3", "Decaf EA v2"].map((p, k) => (
+                <div class="profile-row"><span>{p}</span><svg viewBox="0 0 120 30"><path d={`M0,${8 + k} C25,30 45,24 70,14 S105,${6 + k} 120,${5 + k}`} /></svg><span class="mono">{["10:30", "12:05", "09:48", "11:10"][k]}</span></div>
+              ))}
+            </div>
+          )}
+          {m.ui === "inventory" && (
+            <table class="ui-inventory">
+              <thead><tr><th class="mono">Lot</th><th class="mono">Process</th><th class="mono">Stock</th><th class="mono">Cover</th></tr></thead>
+              <tbody>{lots.map(([lot, proc, kg, pct]) => (
+                <tr><td>{lot}</td><td>{proc}</td><td class="tnum">{kg}</td><td><span class="meter"><span style={`width:${pct}%`} /></span></td></tr>
+              ))}</tbody>
+            </table>
+          )}
+          {m.ui === "planner" && (
+            <div class="ui-planner">
+              {days.map((d, k) => (
+                <div class="day"><span class="mono">{d}</span>{plan.map((row) => row[k] ? <span class={`block b${row[k]}`}>{row[k] * 12} kg</span> : <span class="block empty" />)}</div>
+              ))}
+            </div>
+          )}
+          {m.ui === "cupping" && (
+            <div class="ui-cupping">
+              <p class="total"><span class="tnum">86.75</span><span class="mono">Guji v14 · 6 cuppers</span></p>
+              {scores.map(([k, v]) => (
+                <div class="score"><span class="mono">{k}</span><span class="track"><span style={`width:${((v as number) - 6) / 4 * 100}%`} /></span><span class="tnum">{(v as number).toFixed(2)}</span></div>
+              ))}
+            </div>
+          )}
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  .modules { padding-block: 8rem 6rem; }
+  .modules-head { margin-bottom: 4rem; align-items: end; }
+  .head-label { grid-column: 1 / span 3; }
+  .head-title { grid-column: 4 / -1; }
+  .stack { display: flex; flex-direction: column; gap: 1.5rem; }
+  .card {
+    position: sticky; top: calc(5.5rem + var(--i) * 1.25rem);
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter);
+    min-height: min(78svh, 760px); padding: clamp(1.5rem, 3vw, 3rem); border-radius: 20px;
+    transform-origin: 50% 0;
+  }
+  .card-paper { background: var(--base-200); color: var(--deep); }
+  .card-ink { background: var(--ink); color: var(--paper); }
+  /* recede tint, driven by --dim while the next card slides over (stays inside the palette) */
+  .card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--dim, 0); }
+  .card-paper::after { background: var(--ink); }
+  .card-ink::after { background: var(--ink-strong); }
+  .card-copy { grid-column: 1 / span 5; display: flex; flex-direction: column; gap: 1.25rem; }
+  .card-copy h3 { font-size: clamp(2.5rem, 4.6vw, 6rem); }
+  .lead { max-width: 22ch; }
+  .points { margin-top: auto; display: grid; gap: 0.6rem; }
+  .points li { padding-top: 0.6rem; border-top: 1px solid color-mix(in oklab, currentColor 25%, transparent); }
+  .card-ui { grid-column: 7 / -1; align-self: center; }
+
+  .ui-profiles { display: grid; gap: 0.75rem; }
+  .profile-row { display: grid; grid-template-columns: 1fr 9rem 4rem; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-radius: 10px; background: color-mix(in oklab, var(--paper) 55%, transparent); }
+  .profile-row svg { width: 100%; height: 30px; }
+  .profile-row path { fill: none; stroke: currentColor; stroke-width: 2; }
+
+  .ui-inventory { width: 100%; border-collapse: collapse; }
+  .ui-inventory th, .ui-inventory td { text-align: left; padding: 0.9rem 0.5rem; border-bottom: 1px solid color-mix(in oklab, var(--paper) 22%, transparent); }
+  .ui-inventory th { font-weight: 400; }
+  .meter { display: block; height: 6px; border-radius: 3px; background: color-mix(in oklab, var(--paper) 20%, transparent); }
+  .meter span { display: block; height: 100%; border-radius: 3px; background: var(--paper); }
+
+  .ui-planner { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.6rem; }
+  .day { display: grid; gap: 0.6rem; }
+  .day .mono { padding-bottom: 0.25rem; }
+  .block { display: flex; align-items: flex-end; min-height: 4.5rem; padding: 0.6rem; border-radius: 8px; font-size: 0.85rem; }
+  .block.b1 { background: color-mix(in oklab, var(--ink) 25%, var(--paper)); }
+  .block.b2 { background: color-mix(in oklab, var(--ink) 45%, var(--paper)); color: var(--ink-strong); }
+  .block.b3 { background: var(--ink); color: var(--paper); }
+  .block.empty { border: 1px dashed color-mix(in oklab, var(--ink) 35%, transparent); }
+
+  .ui-cupping { display: grid; gap: 0.9rem; }
+  .total { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.5rem; }
+  .total .tnum { font-family: var(--ff-display); font-weight: 800; font-size: clamp(3rem, 6vw, 6.5rem); letter-spacing: -0.04em; line-height: 0.9; }
+  .score { display: grid; grid-template-columns: 7rem 1fr 3rem; align-items: center; gap: 1rem; }
+  .track { height: 6px; border-radius: 3px; background: color-mix(in oklab, var(--paper) 20%, transparent); }
+  .track span { display: block; height: 100%; border-radius: 3px; background: var(--paper); }
+
+  @media (max-width: 1000px) {
+    .modules { padding-block: 5rem 4rem; }
+    .modules-head { margin-bottom: 2.5rem; row-gap: 1rem; }
+    .head-label, .head-title, .card-copy, .card-ui { grid-column: 1 / -1; }
+    .card { position: relative; top: 0; min-height: 0; row-gap: 2rem; }
+    .profile-row { grid-template-columns: 1fr 5rem; }
+    .profile-row .mono { display: none; }
+    .score { grid-template-columns: 5.5rem 1fr 2.5rem; }
+    .ui-inventory td:nth-child(2), .ui-inventory th:nth-child(2) { display: none; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap.js";
+  import { onPage } from "../../scripts/lifecycle.js";
+  onPage("[data-stack]", (root, { mm, reduced }) => {
+    if (reduced) return;
+    mm.add("(min-width: 1001px)", () => {
+      const cards = gsap.utils.toArray(root.querySelectorAll(".card"));
+      cards.forEach((card, i) => {
+        const next = cards[i + 1];
+        if (!next) return;
+        // as the next card slides over, this one recedes
+        gsap.to(card, {
+          scale: 0.92, "--dim": 0.3, ease: "none",
+          scrollTrigger: { trigger: next, start: "top bottom", end: "top top+=120", scrub: true, invalidateOnRefresh: true },
+        });
+      });
+    });
+  });
+</script>

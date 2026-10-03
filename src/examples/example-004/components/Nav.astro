@@ -1,0 +1,81 @@
+---
+import { Image } from "astro:assets";
+import { EXHIBITION, SIDE } from "../data";
+const links = [
+  { href: "#now", label: "Now showing" },
+  { href: "#develop", label: "The works" },
+  { href: "#programme", label: "Programme" },
+  { href: "#visit", label: "Visit" },
+];
+---
+<header class="nav">
+  <a href="/example-004/" class="logo" aria-label="Bayang home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" /><circle cx="12" cy="12" r="6" fill="currentColor" /></svg>
+    <span>Bayang</span>
+  </a>
+  <p class="label center">Now — {EXHIBITION.title}</p>
+  <div class="actions">
+    <a href="#visit" class="label link-line visit">Plan a visit</a>
+    <button class="menu-toggle label" aria-expanded="false" aria-controls="menu">
+      <span class="toggle-word"><span>Menu</span><span>Close</span></span>
+    </button>
+  </div>
+</header>
+
+<div id="menu" class="menu" hidden>
+  <div class="menu-grid">
+    <nav aria-label="Main">
+      <ul>
+        {links.map((l) => <li><a href={l.href} class="menu-link">{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <aside class="menu-card menu-sub">
+      <div class="menu-img"><Image src={SIDE.img} alt="" widths={[400, 800]} sizes="16rem" /></div>
+      <p class="label">{EXHIBITION.title} — {EXHIBITION.english}</p>
+      <p class="label muted">{EXHIBITION.dates}</p>
+    </aside>
+  </div>
+  <div class="menu-foot">
+    <p class="label menu-sub">Jl. Braga 61, Bandung</p>
+    <p class="label menu-sub">Tue — Sun · free entry</p>
+    <p class="label menu-sub">Instagram · Newsletter</p>
+  </div>
+</div>
+
+<style>
+  /* Pure black & white: difference blending keeps the nav legible on both grounds. */
+  .nav {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem;
+    padding: 1rem var(--gutter); color: #fff; mix-blend-mode: difference;
+  }
+  .logo { display: inline-flex; align-items: center; gap: 0.55rem; justify-self: start; font-family: var(--ff-display); font-size: 1.65rem; letter-spacing: -0.02em; line-height: 1; }
+  .logo svg { width: 1.15rem; height: 1.15rem; }
+  .actions { justify-self: end; display: flex; align-items: center; gap: 2rem; }
+  .menu-toggle { padding: 0.4rem 0; }
+  .toggle-word { display: inline-flex; flex-direction: column; height: 1.25em; overflow: hidden; }
+  .toggle-word span { display: block; }
+
+  .menu {
+    position: fixed; inset: 0; z-index: 40; background: var(--ink); color: var(--paper);
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 6.5rem var(--gutter) var(--gutter);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%);
+    --muted: color-mix(in oklab, #fff 60%, #000);
+  }
+  .menu[hidden] { display: none; }
+  .menu-grid { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; }
+  .menu-link { display: inline-block; font-family: var(--ff-display); font-size: clamp(3.25rem, 9vw, 9.5rem); line-height: 0.98; letter-spacing: -0.04em; }
+  .menu-link:hover { font-style: italic; }
+  .menu-card { width: 16rem; display: grid; gap: 0.5rem; }
+  .menu-img { aspect-ratio: 4 / 5; overflow: hidden; margin-bottom: 0.4rem; }
+  .menu-foot { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--paper); padding-top: 0.9rem; }
+
+  @media (max-width: 1000px) {
+    .nav { grid-template-columns: 1fr auto; }
+    .center, .visit { display: none; }
+    .menu-grid { grid-template-columns: 1fr; }
+    .menu-card { display: none; }
+    .menu-foot { flex-direction: column; }
+  }
+</style>

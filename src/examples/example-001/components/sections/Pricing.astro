@@ -1,0 +1,58 @@
+---
+const tiers = [
+  { name: "Batch", price: 29, who: "One roaster, getting serious", features: ["1 roaster connected", "Unlimited roast logs", "Profiles & background curves", "Green inventory (up to 20 lots)"], cta: "Start trial" },
+  { name: "Roastery", price: 89, who: "Busy roastery with wholesale", features: ["Up to 3 roasters", "Production planner", "Wholesale & webshop orders", "Cupping & QC for 10 users", "Shopify and WooCommerce sync"], cta: "Start trial", featured: true },
+  { name: "Network", price: null, who: "Multi-site and co-roasting", features: ["Unlimited roasters & sites", "Shared profiles across locations", "Audit trail & lot traceability", "Priority onboarding in your roastery"], cta: "Talk to us" },
+];
+---
+<section id="pricing" class="pricing invert" data-nav-dark>
+  <div class="container">
+    <div class="pricing-head cols">
+      <p class="mono bracket head-label">Pricing</p>
+      <h2 class="head-title" data-copy="lines">Priced per roastery,<br />not per kilo.</h2>
+    </div>
+    <div class="tiers">
+      {tiers.map((t) => (
+        <article class={`tier reveal-up${t.featured ? " featured" : ""}`}>
+          <header>
+            <p class="mono">{t.featured ? "Most roasteries" : " "}</p>
+            <h3>{t.name}</h3>
+            <p class="who">{t.who}</p>
+          </header>
+          <p class="price">{t.price ? <><span class="tnum">${t.price}</span><span class="mono">/ month</span></> : <span class="custom">Custom</span>}</p>
+          <ul>{t.features.map((f) => <li>{f}</li>)}</ul>
+          <a href="#trial" class={`btn${t.featured ? "" : " ghost"}`}>{t.cta} <span class="arrow" aria-hidden="true">→</span></a>
+        </article>
+      ))}
+    </div>
+    <p class="mono note">All plans: 14-day free trial · No card required · Cancel any time · Prices in USD, billed monthly</p>
+  </div>
+</section>
+
+<style>
+  .pricing { padding-block: 8rem 6rem; }
+  .pricing-head { margin-bottom: 4rem; align-items: end; }
+  .head-label { grid-column: 1 / span 3; }
+  .head-title { grid-column: 4 / -1; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+  .tier {
+    display: flex; flex-direction: column; gap: 1.75rem; padding: 2rem; border-radius: 20px;
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--paper) 30%, transparent);
+  }
+  .tier.featured { background: var(--paper); color: var(--ink); box-shadow: none; }
+  .tier.featured .btn { background: var(--ink); color: var(--paper); }
+  .tier h3 { font-size: clamp(2.25rem, 3.5vw, 4rem); margin-top: 0.5rem; }
+  .who { margin-top: 0.5rem; }
+  .price { display: flex; align-items: baseline; gap: 0.5rem; }
+  .price .tnum, .custom { font-family: var(--ff-display); font-weight: 800; font-size: clamp(3rem, 5vw, 5.5rem); letter-spacing: -0.04em; line-height: 0.9; }
+  ul { display: grid; gap: 0.6rem; flex: 1; }
+  li { padding-top: 0.6rem; border-top: 1px solid color-mix(in oklab, currentColor 22%, transparent); }
+  .tier .btn { align-self: flex-start; }
+  .note { margin-top: 2.5rem; }
+  @media (max-width: 1000px) {
+    .pricing { padding-block: 5rem 4rem; }
+    .pricing-head { margin-bottom: 2.5rem; row-gap: 1rem; }
+    .head-label, .head-title { grid-column: 1 / -1; }
+    .tiers { grid-template-columns: 1fr; }
+  }
+</style>

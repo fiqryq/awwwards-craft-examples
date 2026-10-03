@@ -1,0 +1,245 @@
+---
+import { Font, Image } from "astro:assets";
+import { EXAMPLES } from "../examples/registry";
+import { PROMPTS, TEMPLATE } from "../examples/prompts";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Awwwards Craft — Examples</title>
+    <meta name="description" content="Single-page sites built with the awwwards-craft skill: Astro, strict TypeScript, hand-written CSS, GSAP and Lenis." />
+    <Font cssVariable="--font-index" preload />
+  </head>
+  <body>
+    <header class="head wrap">
+      <p class="label">Awwwards Craft</p>
+      <p class="label">{String(EXAMPLES.length).padStart(2, "0")} examples</p>
+    </header>
+
+    <main class="wrap">
+      <section class="intro">
+        <h1>Examples</h1>
+        <p class="lede">
+          Each route is a complete single-page site built with the <code>awwwards-craft</code> skill — one concept, one palette, one signature
+          scroll moment. Astro, strict TypeScript, hand-written CSS, GSAP and Lenis. No Tailwind.
+        </p>
+      </section>
+
+      <ol class="list">
+        {EXAMPLES.map((e) => (
+          <li class="item">
+            <div class="num">{e.n}</div>
+            <div class="body">
+              <p class="label muted">{e.kind}</p>
+              <h2><a href={e.href} class="card-link">{e.name} <span class="arrow" aria-hidden="true">→</span></a></h2>
+              <p class="concept">{e.concept}</p>
+              <dl class="meta">
+                <div>
+                  <dt class="label muted">Palette</dt>
+                  <dd class="swatches">
+                    {e.palette.colors.map((c) => <span class="sw" style={`background:${c}`} title={c}></span>)}
+                    <span>#{e.palette.no}</span>
+                  </dd>
+                </div>
+                <div><dt class="label muted">Type</dt><dd>{e.type}</dd></div>
+                <div><dt class="label muted">Signature</dt><dd>{e.signature}</dd></div>
+                <div><dt class="label muted">Variants</dt><dd>{e.variants}</dd></div>
+              </dl>
+              {PROMPTS[e.n] && (
+                <div class="actions">
+                  <button type="button" class="pill copy" data-copy-target={`prompt-${e.n}`}>
+                    <span class="copy-label">Copy prompt</span>
+                  </button>
+                  <button type="button" class="pill ghost toggle" aria-expanded="false" aria-controls={`panel-${e.n}`}>Show prompt</button>
+                </div>
+              )}
+            </div>
+            <div class="shots">
+              <Image src={e.preview} alt={`${e.name} hero`} widths={[600, 1000, 1440]} sizes="(max-width: 1000px) 100vw, 45vw" class="shot" />
+              <Image src={e.previewAlt} alt={`${e.name} signature scene`} widths={[600, 1000, 1440]} sizes="(max-width: 1000px) 100vw, 45vw" class="shot alt" />
+            </div>
+            {PROMPTS[e.n] && (
+              <div class="panel" id={`panel-${e.n}`} hidden>
+                <pre id={`prompt-${e.n}`}>{PROMPTS[e.n]}</pre>
+              </div>
+            )}
+          </li>
+        ))}
+      </ol>
+
+      <section class="howto">
+        <p class="label muted">Add an example</p>
+        <ol>
+          <li>Copy a folder in <code>src/examples/</code> to <code>example-00N</code> and rewrite its <code>BRIEF.md</code>.</li>
+          <li>Add <code>src/pages/example-00N/index.astro</code>, its fonts in <code>astro.config.mjs</code> (own CSS variable names) and a unique <code>seen-00N</code> preloader key.</li>
+          <li>Register it in <code>src/examples/registry.ts</code> with two preview screenshots, and its prompt in <code>src/examples/prompts.ts</code>.</li>
+        </ol>
+        <div class="template">
+          <div class="template-head">
+            <p class="label muted">Or just ask — prompt template</p>
+            <button type="button" class="pill copy" data-copy-target="prompt-template"><span class="copy-label">Copy template</span></button>
+          </div>
+          <pre id="prompt-template">{TEMPLATE}</pre>
+        </div>
+      </section>
+      <p class="visually-hidden" aria-live="polite" id="copy-status"></p>
+    </main>
+
+    <footer class="foot wrap">
+      <p class="label muted">Fictional brands · photography from Unsplash</p>
+      <p class="label muted">Built with Astro</p>
+    </footer>
+    <script>
+      // Copy buttons: copy the text of the <pre> named by data-copy-target.
+      const status = document.getElementById("copy-status");
+      // Clipboard API needs a secure context (localhost is fine). If it is unavailable,
+      // select the prompt text instead so it can be copied with Cmd/Ctrl+C.
+      const copyText = async (source: HTMLElement): Promise<boolean> => {
+        try {
+          await navigator.clipboard.writeText(source.textContent ?? "");
+          return true;
+        } catch {
+          source.closest<HTMLElement>("[hidden]")?.removeAttribute("hidden");
+          const range = document.createRange();
+          range.selectNodeContents(source);
+          const sel = window.getSelection();
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+          return false;
+        }
+      };
+      document.querySelectorAll<HTMLButtonElement>("button[data-copy-target]").forEach((btn) => {
+        const label = btn.querySelector<HTMLElement>(".copy-label");
+        const original = label?.textContent ?? "";
+        let timer = 0;
+        btn.addEventListener("click", async () => {
+          const source = document.getElementById(btn.dataset.copyTarget ?? "");
+          if (!source) return;
+          const ok = await copyText(source);
+          if (label) label.textContent = ok ? "Copied ✓" : "Selected — press ⌘C";
+          if (status) status.textContent = ok ? "Prompt copied to clipboard" : "Prompt selected, press Command or Control C to copy";
+          btn.classList.toggle("is-done", ok);
+          window.clearTimeout(timer);
+          timer = window.setTimeout(() => {
+            if (label) label.textContent = original;
+            btn.classList.remove("is-done");
+          }, 1800);
+        });
+      });
+      // Show/hide each card's prompt panel.
+      document.querySelectorAll<HTMLButtonElement>("button.toggle[aria-controls]").forEach((btn) => {
+        const panel = document.getElementById(btn.getAttribute("aria-controls") ?? "");
+        btn.addEventListener("click", () => {
+          if (!panel) return;
+          const open = panel.hidden;
+          panel.hidden = !open;
+          btn.setAttribute("aria-expanded", String(open));
+          btn.textContent = open ? "Hide prompt" : "Show prompt";
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* palette 3 */
+    --paper: #f7f7f7;
+    --ink: #1e1e1e;
+    --muted: color-mix(in oklab, var(--paper) 45%, var(--ink));
+    --line: color-mix(in oklab, var(--ink) 14%, transparent);
+    --ff: var(--font-index), system-ui, sans-serif;
+    --gutter: 1.5rem;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  ol { list-style: none; }
+  html { -webkit-font-smoothing: antialiased; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--ff); font-weight: 400; }
+  ::selection { background: var(--ink); color: var(--paper); }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+</style>
+
+<style>
+  .wrap { max-width: 1800px; margin-inline: auto; padding-inline: var(--gutter); }
+  .label { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--muted); }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 0.9em; padding: 0.1em 0.35em; border-radius: 4px; background: color-mix(in oklab, var(--ink) 7%, transparent); }
+
+  .head { display: flex; justify-content: space-between; padding-block: 1.25rem; }
+  .intro { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: var(--gutter); padding-block: 6rem 4rem; border-bottom: 1px solid var(--ink); }
+  h1 { font-size: clamp(4rem, 13vw, 15rem); font-weight: 600; line-height: 0.8; letter-spacing: -0.05em; }
+  .lede { font-size: clamp(1.1rem, 1.5vw, 1.5rem); line-height: 1.3; max-width: 34ch; justify-self: end; text-wrap: pretty; }
+
+  .item {
+    position: relative;
+    display: grid; grid-template-columns: 7rem 1fr 1.15fr; gap: calc(var(--gutter) * 1.5);
+    padding-block: 2.5rem; border-bottom: 1px solid var(--line);
+  }
+  /* the whole card is clickable via a stretched link; buttons and the panel sit above it */
+  .card-link::after { content: ""; position: absolute; inset: 0; }
+  .card-link:focus-visible { outline: none; }
+  .item:has(.card-link:focus-visible) { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .actions, .panel { position: relative; z-index: 1; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; padding-top: 0.5rem; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.05rem; border-radius: 999px;
+    border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer;
+    font: 500 0.75rem/1 var(--ff); text-transform: uppercase; letter-spacing: 0.06em;
+    transition: background-color 200ms, color 200ms;
+  }
+  .pill:hover { background: var(--paper); color: var(--ink); }
+  .pill.ghost { background: transparent; color: var(--ink); }
+  .pill.ghost:hover { background: var(--ink); color: var(--paper); }
+  .pill.is-done { background: var(--paper); color: var(--ink); }
+  .panel { grid-column: 2 / -1; }
+  pre {
+    margin: 0; padding: 1.25rem 1.4rem; border-radius: 6px; overflow-x: auto;
+    background: var(--ink); color: var(--paper);
+    font: 0.85rem/1.55 ui-monospace, "SFMono-Regular", Menlo, monospace; white-space: pre-wrap;
+  }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .num { font-size: 1rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .body { display: flex; flex-direction: column; gap: 1rem; }
+  h2 { font-size: clamp(2.75rem, 5.5vw, 6.5rem); font-weight: 600; line-height: 0.9; letter-spacing: -0.045em; }
+  .arrow { display: inline-block; font-weight: 400; opacity: 0; translate: -0.4em 0; transition: opacity 300ms, translate 500ms var(--ease-out); }
+  .item:hover .arrow, .item:focus-within .arrow { opacity: 1; translate: 0 0; }
+  .concept { font-size: 1.15rem; line-height: 1.35; max-width: 36ch; }
+  .meta { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem var(--gutter); padding-top: 1.5rem; }
+  .meta div { display: grid; gap: 0.35rem; align-content: start; font-size: 0.95rem; }
+  .swatches { display: flex; align-items: center; gap: 0.35rem; }
+  .sw { width: 1.1rem; height: 1.1rem; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line); }
+  .swatches span:last-child { margin-left: 0.25rem; }
+
+  .shots { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 6px; background: color-mix(in oklab, var(--ink) 8%, transparent); }
+  .shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; transition: scale 900ms var(--ease-out), clip-path 700ms cubic-bezier(0.9, 0, 0.1, 1); }
+  .shot.alt { clip-path: inset(100% 0 0 0); }
+  .item:hover .shot { scale: 1.03; }
+  .item:hover .shot.alt, .item:has(.card-link:focus-visible) .shot.alt { clip-path: inset(0 0 0 0); }
+
+  .howto { display: grid; grid-template-columns: 7rem 1fr; gap: calc(var(--gutter) * 1.5); padding-block: 4rem 6rem; }
+  .howto ol { display: grid; gap: 0.6rem; counter-reset: s; max-width: 70ch; line-height: 1.45; }
+  .howto li { counter-increment: s; }
+  .template { grid-column: 2; display: grid; gap: 0.8rem; margin-top: 2.5rem; max-width: 70ch; }
+  .template-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .howto li::before { content: counter(s, decimal-leading-zero) "  "; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .foot { display: flex; justify-content: space-between; padding-block: 1.25rem 2rem; border-top: 1px solid var(--line); }
+
+  @media (max-width: 1000px) {
+    .intro { grid-template-columns: 1fr; padding-block: 4rem 2.5rem; }
+    .lede { justify-self: start; }
+    .item { grid-template-columns: 1fr; gap: 1.25rem; }
+    .shots { order: -1; }
+    .meta { grid-template-columns: 1fr; }
+    .howto { grid-template-columns: 1fr; gap: 1rem; }
+    .panel, .template { grid-column: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .arrow, .shot, .pill { transition: none; }
+  }
+</style>

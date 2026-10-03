@@ -1,0 +1,102 @@
+---
+const links = [
+  { href: "#roast", label: "The roast" },
+  { href: "#modules", label: "Modules" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#customers", label: "Customers" },
+];
+---
+<header class="nav">
+  <a href="/example-001/" class="logo" aria-label="Firstcrack home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c-4.5 0-8 4.5-8 10s3.5 10 8 10 8-4.5 8-10S16.5 2 12 2Zm0 0c-1.8 3-1.8 6.5 0 10s1.8 7 0 10" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+    <span>Firstcrack</span>
+  </a>
+  <nav aria-label="Primary" class="links">
+    {links.map((l) => <a href={l.href} class="mono link">{l.label}</a>)}
+  </nav>
+  <div class="actions">
+    <a href="#signin" class="mono link signin">Sign in</a>
+    <a href="#trial" class="btn">Start free trial</a>
+    <button class="menu-toggle mono" aria-expanded="false" aria-controls="menu">
+      <span class="toggle-word"><span>Menu</span><span>Close</span></span>
+    </button>
+  </div>
+</header>
+
+<div id="menu" class="menu" hidden>
+  <nav aria-label="Mobile">
+    <ul>
+      {links.map((l) => <li><a href={l.href} class="menu-link">{l.label}</a></li>)}
+    </ul>
+  </nav>
+  <div class="menu-foot">
+    <p class="menu-sub mono">14-day trial · No card needed</p>
+    <a href="#trial" class="menu-sub btn">Start free trial</a>
+  </div>
+</div>
+
+<style>
+  .nav {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+    padding: 1rem var(--gutter);
+    color: var(--ink);
+    transition: color 400ms var(--ease-out), background-color 400ms var(--ease-out);
+  }
+  .nav.is-dark { color: var(--paper); }
+  .nav.is-scrolled { background: color-mix(in oklab, var(--paper) 88%, transparent); backdrop-filter: blur(10px); }
+  .nav.is-scrolled.is-dark { background: color-mix(in oklab, var(--ink) 88%, transparent); }
+  .logo { display: flex; align-items: center; gap: 0.5rem; font-family: var(--ff-display); font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; }
+  .logo svg { width: 1.4rem; height: 1.4rem; }
+  .links { display: flex; gap: 2rem; }
+  .link { position: relative; padding-block: 0.25rem; }
+  .link::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: currentColor;
+    transform: scaleX(0); transform-origin: right; transition: transform 400ms var(--ease-out);
+  }
+  .link:hover::after { transform: scaleX(1); transform-origin: left; }
+  .actions { display: flex; align-items: center; gap: 1.5rem; }
+  .actions .btn { padding: 0.75rem 1.1rem; font-size: 0.75rem; }
+  .nav.is-dark .btn { background: var(--paper); color: var(--ink); }
+  .menu-toggle { display: none; position: relative; z-index: 2; }
+  .toggle-word { display: inline-flex; flex-direction: column; height: 1.1em; overflow: hidden; }
+  .toggle-word span { display: block; }
+
+  .menu {
+    position: fixed; inset: 0; z-index: 40;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 6rem var(--gutter) var(--gutter);
+    background: var(--ink); color: var(--paper);
+    clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+  }
+  .menu[hidden] { display: none; }
+  .menu-link { font-family: var(--ff-display); font-weight: 800; font-size: clamp(3rem, 14vw, 6rem); letter-spacing: -0.04em; line-height: 0.95; }
+  .menu-foot { display: flex; flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .menu-foot .btn { background: var(--paper); color: var(--ink); }
+
+  @media (max-width: 1000px) {
+    .links, .signin, .actions > .btn { display: none; }
+    .menu-toggle { display: inline-flex; }
+    :global(body:has(.menu:not([hidden]))) .nav { color: var(--paper); background: transparent; backdrop-filter: none; }
+  }
+</style>
+
+<script>
+  import { ScrollTrigger } from "../scripts/lenis-gsap.js";
+  const nav = document.querySelector(".nav");
+  // Nav turns light over dark sections (more reliable than mix-blend-mode).
+  document.querySelectorAll("[data-nav-dark]").forEach((section) => {
+    ScrollTrigger.create({
+      trigger: section, start: "top 40px", end: "bottom 40px",
+      refreshPriority: -1, // measure after pins above/inside have added their spacing
+      onToggle: (self) => nav?.classList.toggle("is-dark", self.isActive),
+    });
+  });
+  // Single page: in-page links inside the menu close it first (Lenis is stopped while it's open),
+  // then reveals.js scrolls to the anchor.
+  const toggle = document.querySelector(".menu-toggle");
+  document.querySelectorAll('#menu a[href^="#"]').forEach((a) =>
+    a.addEventListener("click", () => { if (toggle?.getAttribute("aria-expanded") === "true") toggle.click(); })
+  );
+  ScrollTrigger.create({ start: 80, onToggle: (self) => nav?.classList.toggle("is-scrolled", self.isActive) });
+</script>

@@ -1,0 +1,58 @@
+---
+const cols = [
+  { h: "Gallery", items: ["Jl. Braga 61, Bandung", "Tue — Sun, from 10:00", "Free entry"] },
+  { h: "Contact", items: ["halo@bayang.example", "+62 22 000 0061"] },
+  { h: "Follow", items: ["Instagram", "Newsletter", "Archive"] },
+];
+---
+<footer class="footer invert">
+  <div class="container">
+    <div class="cols info">
+      {cols.map((c) => (
+        <div class="col">
+          <p class="label muted">{c.h}</p>
+          <ul>{c.items.map((it) => <li>{it}</li>)}</ul>
+        </div>
+      ))}
+      <div class="col">
+        <p class="label muted">Bandung</p>
+        <p class="time tnum" data-clock>--:--</p>
+      </div>
+    </div>
+    <p class="wordmark" aria-hidden="true" data-wordmark><span>Bayang</span></p>
+    <div class="legal">
+      <p class="label muted">© 2026 Bayang — a fictional gallery</p>
+      <a href="#top" class="label link-line">Back to the light ↑</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { padding-top: 5rem; overflow: clip; --line: var(--paper); --muted: color-mix(in oklab, #fff 62%, #000); }
+  .info { padding-block: 1.5rem; border-top: 1px solid var(--line); row-gap: 2rem; }
+  .col { grid-column: span 3; display: grid; align-content: start; gap: 0.6rem; }
+  .col ul { display: grid; gap: 0.2rem; font-weight: 300; }
+  .time { font-family: var(--ff-display); font-size: 3.4rem; line-height: 0.9; letter-spacing: -0.02em; }
+  .wordmark {
+    font-family: var(--ff-display); font-size: 30vw; line-height: 0.82; letter-spacing: -0.06em;
+    margin-top: 2rem; margin-left: -0.04em; white-space: nowrap; overflow: hidden; padding-bottom: 0.14em;
+  }
+  .wordmark span { display: inline-block; }
+  .legal { display: flex; justify-content: space-between; padding-block: 1rem 3rem; border-top: 1px solid var(--line); }
+  @media (max-width: 1000px) {
+    .col { grid-column: span 6 !important; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+  // The wordmark slides up out of the footer edge as you reach the end.
+  onPage<HTMLElement>("[data-wordmark]", (root, { reduced }) => {
+    if (reduced) return;
+    gsap.from(root.children, {
+      yPercent: 100, duration: 1.6, ease: "hop",
+      scrollTrigger: { trigger: root, start: "top 95%", once: true },
+    });
+  });
+</script>

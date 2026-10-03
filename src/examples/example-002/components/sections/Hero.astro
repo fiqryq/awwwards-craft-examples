@@ -1,0 +1,64 @@
+---
+import { DOORS } from "../../data";
+---
+<section class="hero" id="top">
+  <div class="container hero-inner">
+    <div class="hero-top">
+      <p class="mono reveal-fade">[ Edisi 04 ]</p>
+      <p class="mono reveal-fade">Festival of broadcast sound</p>
+      <p class="mono reveal-fade">Pelabuhan Sunda Kelapa, Jakarta</p>
+      <p class="mono reveal-fade">14 — 16 . 11 . 2026</p>
+    </div>
+
+    <h1 class="title" data-copy="chars" data-copy-manual data-scroll="false">Sinyal</h1>
+
+    <div class="hero-body cols">
+      <p class="lg lead" data-copy="lines" data-copy-manual data-scroll="false">
+        Three nights, four stages, one frequency band. Thirty-eight artists broadcast live from the old harbour — tune in with your feet.
+      </p>
+      <div class="ctas reveal-fade">
+        <a href="#passes" class="btn">Get passes <span aria-hidden="true">→</span></a>
+        <a href="#tune" class="btn ghost">Tune in</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-footer container">
+    <p class="mono reveal-fade"><span class="dot live" aria-hidden="true"></span> Doors in <span class="tnum" data-countdown={DOORS}>—</span></p>
+    <p class="mono reveal-fade">Scroll to tune ↓</p>
+    <p class="mono reveal-fade">4 stages · 38 artists · 1 band</p>
+  </div>
+</section>
+
+<style>
+  .hero { min-height: 100svh; display: flex; flex-direction: column; padding-top: 4.5rem; overflow: clip; }
+  .hero-inner { flex: 1; display: flex; flex-direction: column; }
+  .hero-top {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gutter);
+    padding-block: 1rem; border-top: 1px solid var(--line);
+  }
+  .hero-top p:last-child { text-align: right; }
+  .title {
+    margin-top: auto; margin-inline: -0.02em;
+    font-size: clamp(6rem, 39.6vw, 56rem); line-height: 0.74;
+    white-space: nowrap;
+  }
+  .hero-body { align-items: end; padding-block: 1.5rem 5rem; }
+  .lead { grid-column: 1 / span 6; max-width: 34ch; }
+  .ctas { grid-column: 9 / -1; justify-self: end; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .section-footer {
+    position: absolute; inset-inline: 0; bottom: 0;
+    display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding-block: 1rem;
+  }
+  .section-footer .dot { width: 0.55em; height: 0.55em; margin-right: 0.35rem; vertical-align: 0; }
+
+  @media (max-width: 1000px) {
+    .hero-top { grid-template-columns: 1fr 1fr; row-gap: 0.4rem; }
+    .hero-top p:nth-child(even) { text-align: right; }
+    .title { font-size: 39.6vw; margin-top: 3rem; }
+    .hero-body { padding-bottom: 5rem; row-gap: 1.5rem; }
+    .ctas { justify-self: start; }
+    .section-footer p:nth-child(2) { display: none; }
+  }
+</style>

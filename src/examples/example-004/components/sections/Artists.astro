@@ -1,0 +1,58 @@
+---
+import { Image } from "astro:assets";
+import { ARTISTS, PORTRAITS } from "../../data";
+const items = [...ARTISTS, ...ARTISTS];
+---
+<section class="artists invert" aria-labelledby="artists-title">
+  <div class="container">
+    <div class="label-row">
+      <p class="label" id="artists-title">[ 04 ] Artists in the collection</p>
+      <p class="label">Since 2014</p>
+    </div>
+  </div>
+  <div class="marquee" data-speed="45" data-scroll-reactive>
+    <div class="marquee-track">
+      {items.map((name, i) => (
+        <span class="marquee-item" aria-hidden={i >= ARTISTS.length ? "true" : undefined}>{name}<span class="sep" aria-hidden="true">○</span></span>
+      ))}
+    </div>
+  </div>
+  <div class="container">
+    <ul class="archive">
+      {PORTRAITS.map((p, i) => (
+        <li class:list={["frame", "reveal-clip", `f${i}`]}>
+          <Image src={p.img} alt={p.alt} widths={[400, 700]} sizes="(max-width: 1000px) 50vw, 20vw" />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .artists { padding-block: 5rem 7rem; overflow: clip; --line: var(--paper); }
+  .marquee { overflow: hidden; padding-block: 3rem; }
+  .marquee-track { display: flex; width: max-content; }
+  .marquee-item {
+    display: inline-flex; align-items: center; gap: 3rem; padding-right: 3rem; white-space: nowrap;
+    font-family: var(--ff-display); font-size: clamp(3.5rem, 9vw, 11rem); line-height: 1; letter-spacing: -0.035em;
+  }
+  .marquee-item:nth-child(odd) { font-style: italic; }
+  .sep { font-size: 0.3em; font-style: normal; }
+  .archive { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--gutter); align-items: start; }
+  .frame { aspect-ratio: 3 / 4; overflow: hidden; }
+  .f1, .f3 { margin-top: 5rem; }
+  @media (max-width: 1000px) {
+    .archive { grid-template-columns: repeat(2, 1fr); }
+    .f1, .f3 { margin-top: 0; }
+    .f4 { display: none; }
+  }
+</style>
+
+<script>
+  import { onPage } from "../../scripts/lifecycle";
+  import { marquee } from "../../scripts/marquee";
+  onPage(".artists .marquee", (root, { reduced }) => {
+    if (reduced) return;
+    return marquee(root);
+  });
+</script>

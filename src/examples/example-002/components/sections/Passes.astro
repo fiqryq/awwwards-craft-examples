@@ -1,0 +1,69 @@
+---
+import { PASSES } from "../../data";
+---
+<section class="passes" id="passes">
+  <div class="container">
+    <div class="label-row">
+      <p class="mono">[ 03 ] Passes</p>
+      <p class="mono">Prices in IDR · incl. tax · no booking fee</p>
+    </div>
+    <h2 class="passes-title" data-copy="lines">Get on<br />the frequency</h2>
+
+    <ol class="stubs">
+      {PASSES.map((p, i) => (
+        <li class="stub reveal-up">
+          <div class="stub-main">
+            <p class="mono">No. 0{i + 1} — {p.phase}</p>
+            <h3>{p.name}</h3>
+            <p class="detail">{p.detail}</p>
+          </div>
+          <div class="stub-meter">
+            <p class="mono">{Math.round(p.sold * 100)}% sold</p>
+            <span class="meter"><span class="fill" style={`--sold:${p.sold}`}></span></span>
+          </div>
+          <div class="stub-tear">
+            <p class="price"><span class="mono">IDR</span>{p.price}</p>
+            <a href="#passes" class="btn">Buy <span aria-hidden="true">→</span></a>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="mono foot reveal-up">Resale opens 20.10 through the official app only · 18+ · ID checked at the gate</p>
+  </div>
+</section>
+
+<style>
+  .passes { padding-block: 2rem 7rem; }
+  .passes-title { margin-block: 2rem 4rem; }
+  .stubs { display: grid; gap: 1rem; }
+  .stub {
+    --notch: 14px;
+    display: grid; grid-template-columns: 6fr 3fr 3fr; align-items: stretch;
+    background: var(--ink); color: var(--paper);
+    /* punched notches at the tear line */
+    mask: radial-gradient(circle var(--notch) at 75% 0, #0000 98%, #000) top / 100% 51% no-repeat,
+          radial-gradient(circle var(--notch) at 75% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+  }
+  .stub > div { padding: 1.5rem 1.75rem; }
+  .stub-main { display: grid; gap: 0.6rem; }
+  .stub-main h3 { font-size: clamp(2.5rem, 4.5vw, 5.5rem); }
+  .detail { opacity: 0.85; }
+  .stub-meter { display: flex; flex-direction: column; justify-content: flex-end; gap: 0.6rem; }
+  .meter { display: block; height: 6px; background: color-mix(in oklab, var(--paper) 25%, transparent); }
+  .fill { display: block; height: 100%; width: calc(var(--sold) * 100%); background: var(--paper); }
+  .stub-tear {
+    display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 1.5rem;
+    border-left: 2px dashed color-mix(in oklab, var(--paper) 45%, transparent);
+  }
+  .price { font-family: var(--ff-display); font-weight: 700; font-size: clamp(3rem, 5vw, 6rem); line-height: 0.8; display: flex; gap: 0.5rem; align-items: flex-start; }
+  .price .mono { font-size: 0.75rem; }
+  .stub .btn { background: var(--paper); color: var(--ink); }
+  .stub .btn::before { background: #fff; }
+  .foot { margin-top: 1.5rem; }
+
+  @media (max-width: 1000px) {
+    .stub { grid-template-columns: 1fr; mask: none; }
+    .stub > div { padding: 1.25rem; }
+    .stub-tear { border-left: 0; border-top: 2px dashed color-mix(in oklab, var(--paper) 45%, transparent); flex-direction: row; align-items: center; }
+  }
+</style>

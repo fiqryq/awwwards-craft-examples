@@ -1,0 +1,54 @@
+---
+import { Image } from "astro:assets";
+import { hero } from "../../data";
+---
+<section class="hero" id="top" data-nav-dark>
+  <div class="hero-media">
+    <Image src={hero} alt="Rumah Kabut at dusk: a timber house with lit rooms under a large tree" widths={[1000, 1600, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />
+  </div>
+  <div class="hero-copy container">
+    <p class="label intro reveal-fade">Lengkung is an architecture studio in Yogyakarta. We design houses, prayer houses and small public rooms — always starting at the door.</p>
+    <h1 data-copy="words" data-copy-manual data-scroll="false">Rooms for <em>slow</em> light</h1>
+  </div>
+  <div class="section-footer container">
+    <p class="label reveal-fade">Arsitek — Yogyakarta</p>
+    <p class="label reveal-fade">Residential · Cultural · Sacred</p>
+    <p class="label reveal-fade">Est. 2011</p>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; height: 100svh; min-height: 34rem; overflow: clip; color: var(--paper); background: var(--ink); }
+  .hero-media { position: absolute; inset: 0; }
+  .hero-media::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgb(15 15 15 / 0.7), rgb(15 15 15 / 0) 55%), linear-gradient(to bottom, rgb(15 15 15 / 0.35), rgb(15 15 15 / 0) 22%);
+  }
+  .hero-copy {
+    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
+    padding-bottom: 5.5rem;
+  }
+  .intro { max-width: 30ch; margin-bottom: 2rem; line-height: 1.45; }
+  h1 { max-width: 9ch; }
+  h1 em { font-weight: 500; }
+  .section-footer {
+    position: absolute; inset-inline: 0; bottom: 0;
+    display: flex; justify-content: space-between; gap: 1rem; padding-block: 1.25rem;
+  }
+  @media (max-width: 1000px) {
+    .section-footer p:nth-child(2) { display: none; }
+    h1 { font-size: 17vw; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+  // Gentle parallax: the photo sinks and the copy lifts away as you scroll out of the hero.
+  onPage<HTMLElement>(".hero", (root, { reduced }) => {
+    if (reduced) return;
+    const st = { trigger: root, start: "top top", end: "bottom top", scrub: true };
+    gsap.to(root.querySelector(".hero-media"), { yPercent: 22, ease: "none", scrollTrigger: st });
+    gsap.to(root.querySelector(".hero-copy"), { yPercent: -12, opacity: 0.2, ease: "none", scrollTrigger: st });
+  });
+</script>

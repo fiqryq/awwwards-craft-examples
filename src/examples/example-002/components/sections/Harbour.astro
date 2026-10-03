@@ -1,0 +1,72 @@
+---
+const facts = [
+  { k: "Gates", v: "18:00 — 06:00 WIB, each night" },
+  { k: "Getting there", v: "KRL to Jakarta Kota, then the free Sinyal shuttle every 10 min from Stasiun Kota north exit." },
+  { k: "Capacity", v: "6,500 per night across four stages. Kapal sails at 21:00, 23:30 and 02:00." },
+  { k: "Sound", v: "d&b on Dermaga, a Funktion-One stack in Gudang, quad sound at Menara." },
+];
+const faq = [
+  { q: "Is it cashless?", a: "Yes. Top up your wristband in the app or at the four booths by the gate. Unused balance is refunded within 7 days." },
+  { q: "Can I re-enter?", a: "Full band and Harbour passes can re-enter once per night. Single-night passes cannot." },
+  { q: "What if it rains?", a: "Dermaga and Gudang are covered. Menara moves into the customs house; the schedule stays the same." },
+  { q: "Is there a radio stream?", a: "Every Menara set is broadcast live on 98.3 FM across North Jakarta and streamed in the app." },
+];
+---
+<section class="harbour invert" id="harbour" data-nav-dark>
+  <div class="container">
+    <div class="label-row">
+      <p class="mono">[ 04 ] The harbour</p>
+      <p class="mono">-6.1229, 106.8106</p>
+    </div>
+    <div class="cols grid">
+      <h2 class="title" data-copy="lines">Old port,<br />new noise</h2>
+      <p class="lg intro" data-copy="lines">
+        Sunda Kelapa has moved spice, timber and phinisi schooners for five centuries. For three nights a year it moves bass. Here is what you need to know.
+      </p>
+      <dl class="facts">
+        {facts.map((f) => (
+          <div class="fact reveal-up">
+            <dt class="mono">{f.k}</dt>
+            <dd>{f.v}</dd>
+          </div>
+        ))}
+      </dl>
+      <div class="faq">
+        {faq.map((f) => (
+          <details class="reveal-up">
+            <summary><span>{f.q}</span><span class="plus" aria-hidden="true"></span></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .harbour { padding-block: 5rem 7rem; }
+  .grid { row-gap: 3rem; padding-top: 2rem; }
+  .title { grid-column: 1 / span 7; }
+  .intro { grid-column: 8 / -1; align-self: end; }
+  .facts { grid-column: 1 / span 5; display: grid; }
+  .fact { display: grid; grid-template-columns: 9rem 1fr; gap: 1rem; padding-block: 1rem; border-top: 1px solid var(--line); }
+  .faq { grid-column: 7 / -1; }
+  details { border-top: 1px solid var(--line); }
+  details:last-child { border-bottom: 1px solid var(--line); }
+  summary {
+    list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    padding-block: 1.1rem; font-family: var(--ff-display); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(1.6rem, 2.4vw, 2.8rem); line-height: 0.9;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .plus { position: relative; width: 1rem; height: 1rem; flex: none; }
+  .plus::before, .plus::after { content: ""; position: absolute; inset: 50% 0 auto; height: 2px; margin-top: -1px; background: currentColor; transition: transform 300ms var(--ease-out); }
+  .plus::after { transform: rotate(90deg); }
+  details[open] .plus::after { transform: rotate(0deg); }
+  details p { padding-bottom: 1.25rem; max-width: 46ch; }
+
+  @media (max-width: 1000px) {
+    .fact { grid-template-columns: 1fr; gap: 0.4rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .plus::after { transition: none; } }
+</style>

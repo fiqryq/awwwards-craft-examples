@@ -1,0 +1,103 @@
+---
+import { Image } from "astro:assets";
+import { WORKS } from "../../data";
+// The scene is two identical layers: a negative (inverted with a filter) underneath, and a
+// positive on top clipped to the left half. Both tracks move together, so every work is
+// "developed" as it crosses the fixed line of light in the middle of the screen.
+const layers = [
+  { kind: "pos", hidden: false },
+  { kind: "neg", hidden: true },
+] as const;
+---
+<section class="develop" id="develop" data-develop>
+  {layers.map((layer) => (
+    <div class:list={["dev-layer", layer.kind]} aria-hidden={layer.hidden ? "true" : undefined} inert={layer.hidden}>
+      <div class="dev-head container">
+        <div class="label-row">
+          <p class="label">[ 02 ] The works</p>
+          <p class="label">{WORKS.length} prints · scroll to develop</p>
+        </div>
+        <h2 class="dev-title">Develop</h2>
+      </div>
+      <ol class="dev-track">
+        {WORKS.map((w, i) => (
+          <li class="work">
+            <figure>
+              <div class="work-img">
+                <Image src={w.img} alt={layer.hidden ? "" : w.alt} widths={[500, 900]} sizes="(max-width: 1000px) 100vw, 30vw" />
+              </div>
+              <figcaption>
+                <p class="label">{String(i + 1).padStart(2, "0")} — {w.artist}</p>
+                <p class="work-title"><em>{w.title}</em>, {w.year}</p>
+                <p class="label muted">{w.medium}</p>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ol>
+    </div>
+  ))}
+  <div class="light" aria-hidden="true"><span class="label">Light</span></div>
+</section>
+
+<style>
+  .develop { background: var(--paper); color: var(--ink); }
+
+  /* ---------- static layout: one positive grid ---------- */
+  .dev-layer.neg, .light { display: none; }
+  .dev-head { padding-top: 2rem; }
+  .dev-title { margin-block: 2rem 3rem; font-size: clamp(3rem, 12vw, 18rem); line-height: 0.85; letter-spacing: -0.045em; }
+  .dev-track { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem var(--gutter); padding: 0 var(--gutter) 6rem; max-width: var(--container-max); margin-inline: auto; }
+  .work-img { aspect-ratio: 4 / 5; overflow: hidden; background: var(--ink); }
+  figcaption { display: grid; gap: 0.3rem; padding-top: 0.8rem; }
+  .work-title { font-family: var(--ff-display); font-size: 1.45rem; line-height: 1.1; font-weight: 400; letter-spacing: -0.01em; }
+
+  /* ---------- pinned scene (desktop + motion; class added by JS) ---------- */
+  .develop.is-scene { height: 100svh; overflow: clip; }
+  .is-scene .dev-layer { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--paper); }
+  .is-scene .dev-layer.neg { filter: invert(1); z-index: 0; }
+  .is-scene .dev-layer.pos { z-index: 1; clip-path: inset(0 50% 0 0); }
+  .is-scene .dev-head { padding-top: 4.2rem; }
+  .is-scene .dev-title { position: absolute; left: var(--gutter); bottom: var(--gutter); margin: 0; font-size: clamp(3rem, 9vw, 13rem); }
+  .is-scene .dev-track {
+    display: flex; gap: 4vw; width: max-content; max-width: none; margin: 0; padding: 0;
+    position: absolute; left: 0; top: 50%; translate: 0 -50%; will-change: transform;
+  }
+  .is-scene .work { width: min(22vw, 44vh); }
+  .is-scene .light { display: block; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; margin-left: -0.5px; z-index: 2; background: #fff; box-shadow: 0 0 18px 2px rgb(255 255 255 / 0.8); }
+  .light .label { position: absolute; top: 5.5rem; left: 0.6rem; color: #fff; }
+
+  @media (max-width: 1000px) {
+    .dev-track { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  import { gsap, ScrollTrigger } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+
+  onPage<HTMLElement>("[data-develop]", (root, { mm, reduced }) => {
+    if (reduced) return;
+    mm.add("(min-width: 1001px)", () => {
+      root.classList.add("is-scene");
+      const tracks = Array.from(root.querySelectorAll<HTMLElement>(".dev-track"));
+      const first = tracks[0];
+      if (!first) return;
+      // Start with every work on the negative (right) side; end with all of them developed.
+      const from = (): number => window.innerWidth * 0.56;
+      const to = (): number => window.innerWidth * 0.44 - first.scrollWidth;
+      const distance = (): number => from() - to();
+
+      const st = ScrollTrigger.create({
+        trigger: root, start: "top top",
+        end: () => "+=" + distance() * 1.1,
+        pin: true, scrub: 1, invalidateOnRefresh: true,
+        onUpdate: (self) => gsap.set(tracks, { x: gsap.utils.interpolate(from(), to(), self.progress) }),
+        onRefresh: (self) => gsap.set(tracks, { x: gsap.utils.interpolate(from(), to(), self.progress) }),
+      });
+      gsap.set(tracks, { x: gsap.utils.interpolate(from(), to(), st.progress) });
+
+      return () => root.classList.remove("is-scene");
+    });
+  });
+</script>

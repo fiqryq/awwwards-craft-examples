@@ -1,0 +1,124 @@
+---
+import { Image } from "astro:assets";
+import { ROOMS } from "../../data";
+---
+<section class="thresholds" id="thresholds" data-thresholds>
+  <div class="th-intro container">
+    <div class="label-row">
+      <p class="label">[ 02 ] Thresholds</p>
+      <p class="label muted">Four rooms from recent work</p>
+    </div>
+    <div class="th-head">
+      <h2 data-copy="lines">Walk through<br /><em>four</em> doors</h2>
+      <p class="th-lead reveal-up">Each project is entered through one decisive threshold. Scroll to step through them, one room at a time.</p>
+    </div>
+  </div>
+
+  <ol class="rooms">
+    {ROOMS.map((r, i) => (
+      <li class="room">
+        <figure class="room-media">
+          <Image src={r.img} alt={r.alt} widths={[800, 1400, 2000]} sizes="(max-width: 1000px) 100vw, 100vw" />
+        </figure>
+        <div class="room-card">
+          <p class="label muted">0{i + 1} / 0{ROOMS.length} · {r.year}</p>
+          <h3>{r.name}</h3>
+          <p class="label">{r.project} — {r.place}</p>
+          <p class="note">{r.note}</p>
+        </div>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .thresholds { padding-block: 2rem 6rem; }
+  .th-head { display: grid; grid-template-columns: 7fr 4fr; gap: var(--gutter); align-items: end; padding-block: 2.5rem 4rem; }
+  .th-lead { max-width: 30ch; }
+
+  /* ---------- static layout: stacked arch-topped rooms ---------- */
+  .rooms { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5rem var(--gutter); padding-inline: var(--gutter); max-width: var(--container-max); margin-inline: auto; }
+  .room:nth-child(even) { margin-top: 10rem; }
+  .room-media { aspect-ratio: 4 / 5; overflow: hidden; border-radius: 999px 999px 0 0; }
+  :global(html.js-motion) .thresholds:not(.is-scene) .room-media { clip-path: inset(100% 0% 0% 0%); }
+  .room-card { display: grid; gap: 0.6rem; padding-top: 1.25rem; max-width: 30rem; }
+  .room-card h3 { margin-block: 0.2rem; }
+  .note { color: var(--muted); }
+
+  /* ---------- pinned scene (desktop + motion; class added by JS) ---------- */
+  .thresholds.is-scene { height: 100svh; padding: 0; overflow: clip; }
+  .is-scene .th-intro { position: absolute; inset: 0; padding-top: 5rem; z-index: 0; }
+  .is-scene .rooms { display: block; padding: 0; max-width: none; }
+  .is-scene .room { position: absolute; inset: 0; margin: 0; pointer-events: none; }
+  .is-scene .room-media { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; clip-path: inset(50%); }
+  .is-scene .room-card {
+    position: absolute; left: var(--gutter); bottom: var(--gutter); z-index: 2;
+    width: min(26rem, 32vw); padding: 1.25rem 1.4rem 1.4rem; background: var(--paper); color: var(--ink);
+    opacity: 0;
+  }
+  .is-scene .note { color: var(--base-300); }
+
+  @media (max-width: 1000px) {
+    .th-head { grid-template-columns: 1fr; }
+    .rooms { grid-template-columns: 1fr; gap: 3.5rem; }
+    .room:nth-child(even) { margin-top: 0; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+  import { pinnedScene } from "../../scripts/pinned-scene";
+  import { archClip, doorway } from "../../scripts/arch";
+
+  const { interpolate } = gsap.utils;
+
+  onPage<HTMLElement>("[data-thresholds]", (root, { mm, reduced }) => {
+    if (reduced) return;
+    mm.add("(min-width: 1001px)", () => {
+      root.classList.add("is-scene");
+      const intro = root.querySelector<HTMLElement>(".th-intro");
+      const rooms = Array.from(root.querySelectorAll<HTMLElement>(".room"));
+      const media = rooms.map((r) => r.querySelector<HTMLElement>(".room-media"));
+      const imgs = rooms.map((r) => r.querySelector<HTMLElement>("img"));
+      const cards = rooms.map((r) => r.querySelector<HTMLElement>(".room-card"));
+      const n = rooms.length;
+
+      pinnedScene(root, {
+        viewports: n * 1.4,
+        render(p) {
+          const W = root.clientWidth;
+          const H = root.clientHeight;
+          const box = doorway(W, H);
+          rooms.forEach((_, i) => {
+            const seg = p * n - i; // 0..1 inside this room's slice
+            const rise = gsap.parseEase("hop")(gsap.utils.clamp(0, 1, seg / 0.38));
+            const open = gsap.parseEase("glide")(gsap.utils.clamp(0, 1, (seg - 0.5) / 0.5));
+            const m = media[i];
+            if (m) m.style.clipPath = rise <= 0 ? "inset(50%)" : archClip(W, H, box, open, rise);
+            const img = imgs[i];
+            if (img) gsap.set(img, { scale: interpolate(1.25, 1, open) });
+            const next = gsap.utils.clamp(0, 1, (seg - 1) / 0.3); // the next room's arch rising
+            const card = cards[i];
+            if (card) gsap.set(card, { opacity: gsap.utils.clamp(0, 1, (rise - 0.6) / 0.4) * (1 - next), y: interpolate(20, 0, rise) });
+          });
+          if (intro) gsap.set(intro, { opacity: 1 - gsap.utils.clamp(0, 1, (p * n - 0.4) / 0.3) });
+        },
+      });
+
+      return () => {
+        root.classList.remove("is-scene");
+        media.forEach((m) => m?.style.removeProperty("clip-path"));
+      };
+    });
+
+    // Small screens: the rooms are a stacked list; each arch wipes up as it arrives.
+    mm.add("(max-width: 1000px)", () => {
+      root.querySelectorAll<HTMLElement>(".room-media").forEach((m) => {
+        gsap.timeline({ scrollTrigger: { trigger: m, start: "top 85%", once: true } })
+          .to(m, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "hop" }, 0)
+          .fromTo(m.querySelector("img"), { scale: 1.3 }, { scale: 1, duration: 1.7, ease: "glide" }, 0);
+      });
+    });
+  });
+</script>

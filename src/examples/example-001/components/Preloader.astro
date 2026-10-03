@@ -1,0 +1,35 @@
+<div class="preloader" aria-hidden="true">
+  <div class="preloader-top">
+    <p class="mono">Charge</p>
+    <p class="mono">Batch #0001 · 12 kg</p>
+  </div>
+  <p class="preloader-title">Firstcrack</p>
+  <div class="preloader-bottom">
+    <p class="counter tnum"><span class="counter-value">020</span><span class="deg">°C</span></p>
+    <div class="bar"><span class="bar-fill"></span></div>
+    <p class="mono">Bean temp</p>
+  </div>
+</div>
+
+<style>
+  .preloader {
+    position: fixed; inset: 0; z-index: 100;
+    display: none; flex-direction: column; justify-content: space-between;
+    padding: var(--gutter);
+    background: var(--ink); color: var(--paper);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+  :global(html.js-motion.first-visit) .preloader { display: flex; }
+  .preloader-top, .preloader-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; }
+  .preloader-title {
+    font-family: var(--ff-display); font-weight: 800; letter-spacing: -0.04em; line-height: 0.85;
+    font-size: clamp(3.5rem, 15vw, 22rem); text-align: center;
+  }
+  .counter { font-family: var(--ff-display); font-weight: 800; font-size: clamp(3rem, 8vw, 9rem); line-height: 0.8; letter-spacing: -0.04em; }
+  .deg { font-size: 0.4em; vertical-align: top; margin-left: 0.1em; }
+  .bar { flex: 1; height: 2px; background: color-mix(in oklab, var(--paper) 25%, transparent); align-self: center; max-width: 40vw; }
+  .bar-fill { display: block; height: 100%; background: var(--paper); transform: scaleX(0); transform-origin: left; }
+  @media (max-width: 1000px) {
+    .bar { display: none; }
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+import { NIGHTS } from "../../data";
+---
+<section class="lineup" id="lineup">
+  <div class="container">
+    <div class="label-row">
+      <p class="mono">[ 02 ] Line-up</p>
+      <p class="mono">Set times subject to tide · final schedule 01.11</p>
+    </div>
+    <h2 class="lineup-title" data-copy="lines">Three nights<br />on one band</h2>
+
+    <div class="nights">
+      {NIGHTS.map((n) => (
+        <div class="night">
+          <div class="night-head reveal-up">
+            <p class="mono">{n.label}</p>
+            <p class="mono">{n.date}</p>
+          </div>
+          <ul>
+            {n.acts.map((a) => (
+              <li class="row reveal-up">
+                <span class="row-name">{a.name}</span>
+                <span class="mono row-meta"><span>{a.stage}</span><span class="tnum">{a.time}</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .lineup { padding-block: 7rem 6rem; }
+  .lineup-title { margin-block: 2rem 4rem; }
+  .nights { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+  .night-head { display: flex; justify-content: space-between; padding-block: 0.75rem; border-bottom: 2px solid var(--fg); }
+  .row {
+    position: relative; isolation: isolate; overflow: hidden;
+    display: grid; gap: 0.35rem; padding: 0.9rem 0.6rem 0.8rem; margin-inline: -0.6rem;
+    border-bottom: 1px solid var(--line);
+    transition: color 250ms var(--ease-out);
+  }
+  .row::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ink);
+    transform: scaleY(0); transform-origin: bottom; transition: transform 350ms var(--ease-out);
+  }
+  .row:hover { color: var(--paper); }
+  .row:hover::before { transform: scaleY(1); }
+  .row-name { font-family: var(--ff-display); font-weight: 700; text-transform: uppercase; font-size: clamp(2rem, 3.3vw, 4.25rem); line-height: 0.85; }
+  .row-meta { display: flex; justify-content: space-between; }
+
+  @media (max-width: 1000px) {
+    .lineup { padding-block: 5rem 4rem; }
+    .nights { grid-template-columns: 1fr; row-gap: 3rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row, .row::before { transition: none; }
+  }
+</style>

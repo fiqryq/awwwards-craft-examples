@@ -1,0 +1,44 @@
+---
+const stats = [
+  { v: "38", k: "Built projects" },
+  { v: "14", k: "People in the studio" },
+  { v: "60 km", k: "Radius for every material" },
+  { v: "1 yr", k: "We stay after handover" },
+];
+---
+<section class="practice" id="practice">
+  <div class="container">
+    <div class="label-row">
+      <p class="label">[ 01 ] Practice</p>
+      <p class="label muted">Est. 2011 · Tirtodipuran</p>
+    </div>
+    <div class="cols body">
+      <p class="label side muted reveal-up">On thresholds</p>
+      <p class="lg statement" data-fill>
+        <span class="indent" aria-hidden="true"></span>A house is not a list of rooms. It is the order you walk through them in — the porch where you slow down, the step where the floor turns cool, the arch where the light changes. We draw those moments first and let the rest of the building follow.
+      </p>
+    </div>
+    <dl class="stats cols">
+      {stats.map((s) => (
+        <div class="stat reveal-up">
+          <dt class="label muted">{s.k}</dt>
+          <dd>{s.v}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .practice { padding-block: 7rem 6rem; }
+  .body { padding-top: 3rem; }
+  .side { grid-column: 1 / span 2; padding-top: 0.8rem; }
+  .statement { grid-column: 3 / span 9; }
+  .stats { margin-top: 6rem; row-gap: 2rem; }
+  .stat { grid-column: span 3; display: flex; flex-direction: column-reverse; gap: 0.6rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .stat dd { font-family: var(--ff-display); font-size: clamp(3rem, 5.5vw, 7rem); line-height: 0.9; letter-spacing: -0.03em; }
+  @media (max-width: 1000px) {
+    .practice { padding-block: 5rem 4rem; }
+    .stat { grid-column: span 6 !important; }
+  }
+</style>

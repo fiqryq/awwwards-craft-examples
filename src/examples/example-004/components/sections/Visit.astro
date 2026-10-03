@@ -1,0 +1,72 @@
+---
+import { HOURS, DAYS } from "../../data";
+// Week shown Monday first.
+const order = [1, 2, 3, 4, 5, 6, 0];
+---
+<section class="visit" id="visit">
+  <div class="container">
+    <div class="label-row">
+      <p class="label">[ 05 ] Visit</p>
+      <p class="label" data-status>Open Tue — Sun</p>
+    </div>
+    <div class="cols grid">
+      <h2 class="title" data-copy="lines">Come in<br /><em>out of the light</em></h2>
+
+      <div class="where reveal-up">
+        <p class="label muted">Address</p>
+        <p class="big">Jl. Braga 61<br />Bandung 40111</p>
+        <p>Five minutes' walk from Gedung Merdeka. The entrance is the old bank door; ring if it is closed during opening hours.</p>
+        <a href="#visit" class="label link-line">Open in maps ↗</a>
+      </div>
+
+      <div class="hours reveal-up">
+        <p class="label muted">Hours (WIB)</p>
+        <table>
+          <tbody>
+            {order.map((d) => {
+              const h = HOURS[d];
+              return (
+                <tr data-day={d}>
+                  <th scope="row">{DAYS[d]}</th>
+                  <td class="tnum">{h ? `${h[0]}:00 — ${h[1]}:00` : "Closed"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notes reveal-up">
+        <p class="label muted">Good to know</p>
+        <ul>
+          <li>Entry is always free.</li>
+          <li>Step-free entrance and lift on Jl. Braga side.</li>
+          <li>Photography allowed without flash.</li>
+          <li>Prints from the exhibition can be reserved at the desk.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit { padding-block: 7rem; }
+  .grid { padding-top: 2.5rem; row-gap: 3.5rem; }
+  .title { grid-column: 1 / -1; margin-bottom: 1rem; }
+  .title em { font-style: italic; }
+  .where { grid-column: 1 / span 4; display: grid; gap: 0.9rem; align-content: start; justify-items: start; }
+  .big { font-family: var(--ff-display); font-size: 2.4rem; line-height: 1; letter-spacing: -0.02em; font-weight: 400; }
+  .hours { grid-column: 6 / span 3; display: grid; gap: 0.9rem; align-content: start; }
+  table { width: 100%; border-collapse: collapse; }
+  tr { border-top: 1px solid var(--line); }
+  tr:last-child { border-bottom: 1px solid var(--line); }
+  th, td { padding: 0.6rem 0.5rem; font-weight: 400; text-align: left; font-size: 0.98rem; }
+  td { text-align: right; }
+  tr.is-today { background: var(--ink); color: var(--paper); }
+  .notes { grid-column: 10 / span 3; display: grid; gap: 0.9rem; align-content: start; }
+  .notes ul { display: grid; gap: 0.6rem; font-weight: 300; }
+  .notes li { padding-top: 0.6rem; border-top: 1px solid var(--line); }
+  @media (max-width: 1000px) {
+    .visit { padding-block: 5rem; }
+  }
+</style>

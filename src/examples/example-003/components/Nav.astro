@@ -1,0 +1,100 @@
+---
+const links = [
+  { href: "#practice", label: "Practice", sub: "Since 2011" },
+  { href: "#thresholds", label: "Thresholds", sub: "Four rooms" },
+  { href: "#work", label: "Work", sub: "38 projects" },
+  { href: "#process", label: "Process", sub: "Four steps" },
+];
+---
+<header class="nav">
+  <a href="/example-003/" class="logo" aria-label="Lengkung home">
+    <svg viewBox="0 0 20 24" aria-hidden="true"><path d="M2 23V10a8 8 0 0 1 16 0v13" fill="none" stroke="currentColor" stroke-width="1.8" /></svg>
+    <span>Lengkung</span>
+  </a>
+  <p class="label center">Arsitek · Yogyakarta</p>
+  <div class="actions">
+    <a href="#contact" class="label link-line visit">Book a site visit</a>
+    <button class="menu-toggle label" aria-expanded="false" aria-controls="menu">
+      <span class="toggle-word"><span>Menu</span><span>Close</span></span>
+    </button>
+  </div>
+</header>
+
+<div id="menu" class="menu" hidden>
+  <nav aria-label="Main">
+    <ul>
+      {links.map((l, i) => (
+        <li>
+          <a href={l.href} class="menu-item">
+            <span class="label menu-sub">0{i + 1}</span>
+            <span class="menu-link">{l.label}</span>
+            <span class="label menu-sub">{l.sub}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="menu-foot">
+    <p class="label menu-sub">Jl. Tirtodipuran 41<br />Yogyakarta 55143</p>
+    <p class="label menu-sub">studio@lengkung.example<br />+62 274 000 041</p>
+  </div>
+</div>
+
+<style>
+  .nav {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem;
+    padding: 1.1rem var(--gutter); color: var(--ink);
+    transition: color 400ms var(--ease-out);
+  }
+  .nav.is-dark { color: var(--paper); }
+  .logo { display: inline-flex; align-items: center; gap: 0.6rem; justify-self: start; font-family: var(--ff-display); font-weight: 500; font-size: 1.6rem; letter-spacing: -0.02em; }
+  .logo svg { width: 1.05rem; height: 1.3rem; }
+  .actions { justify-self: end; display: flex; align-items: center; gap: 2rem; }
+  .menu-toggle { position: relative; z-index: 2; padding: 0.5rem 0; }
+  .toggle-word { display: inline-flex; flex-direction: column; height: 1.2em; overflow: hidden; }
+  .toggle-word span { display: block; }
+  :global(body:has(.menu:not([hidden]))) .nav { color: var(--paper); }
+
+  .menu {
+    position: fixed; inset: 0; z-index: 40; background: var(--ink); color: var(--paper);
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 7rem var(--gutter) var(--gutter);
+    clip-path: circle(0px at 100% 0%);
+  }
+  .menu[hidden] { display: none; }
+  .menu-item {
+    display: grid; grid-template-columns: 6rem 1fr auto; align-items: baseline; gap: 1rem;
+    padding-block: 0.6rem; border-bottom: 1px solid color-mix(in oklab, var(--paper) 18%, transparent);
+  }
+  .menu-link { font-family: var(--ff-display); font-weight: 500; font-size: clamp(3rem, 8vw, 8rem); line-height: 1; letter-spacing: -0.035em; }
+  .menu-item:hover .menu-link { font-style: italic; }
+  .menu-foot { display: flex; gap: 4rem; }
+
+  @media (max-width: 1000px) {
+    .nav { grid-template-columns: 1fr auto; }
+    .center, .visit { display: none; }
+    .menu-item { grid-template-columns: 2.5rem 1fr; }
+    .menu-item > .menu-sub:last-child { display: none; }
+    .menu-foot { flex-direction: column; gap: 1rem; }
+  }
+</style>
+
+<script>
+  import { ScrollTrigger } from "../scripts/lenis-gsap";
+  // Nav turns light over photos and ink sections. Sections opt in with data-nav-dark; a section
+  // can switch itself off at runtime with data-dark="false" (the thresholds scene does).
+  const nav = document.querySelector<HTMLElement>(".nav");
+  const darks = Array.from(document.querySelectorAll<HTMLElement>("[data-nav-dark]"));
+  const update = (): void => {
+    const y = 36;
+    const dark = darks.some((s) => {
+      if (s.dataset.dark === "false") return false;
+      const r = s.getBoundingClientRect();
+      return r.top <= y && r.bottom > y;
+    });
+    nav?.classList.toggle("is-dark", dark);
+  };
+  ScrollTrigger.create({ start: 0, end: "max", onUpdate: update, onRefresh: update });
+  document.addEventListener("nav:update", update);
+</script>

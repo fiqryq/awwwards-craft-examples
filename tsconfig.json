@@ -1,0 +1,6 @@
+{
+  "extends": "astro/tsconfigs/strictest",
+  "include": [".astro/types.d.ts", "**/*"],
+  // example-001 (Firstcrack) predates the TS snippets and ships plain JS; it is not type-checked.
+  "exclude": ["dist", "src/examples/example-001", "src/pages/example-001"]
+}

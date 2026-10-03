@@ -1,0 +1,120 @@
+---
+import { Image } from "astro:assets";
+import { PROJECTS } from "../../data";
+---
+<section class="work" id="work" data-work>
+  <div class="container">
+    <div class="label-row">
+      <p class="label">[ 03 ] Selected work</p>
+      <p class="label muted">6 of 38 · 2021 — 2025</p>
+    </div>
+    <h2 class="work-title" data-copy="lines">Index</h2>
+
+    <ul class="rows">
+      {PROJECTS.map((p, i) => (
+        <li class="row reveal-up" data-index={i}>
+          <a href="#contact" class="row-link">
+            <span class="label muted idx tnum">{String(i + 1).padStart(2, "0")}</span>
+            <span class="thumb"><Image src={p.img} alt="" widths={[300, 600]} sizes="7rem" /></span>
+            <span class="name">{p.name}</span>
+            <span class="label meta type">{p.type}</span>
+            <span class="label meta place">{p.place}</span>
+            <span class="label meta year tnum">{p.year}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="preview" aria-hidden="true">
+    {PROJECTS.map((p) => (
+      <Image src={p.img} alt="" widths={[600, 900]} sizes="22rem" class="preview-img" />
+    ))}
+  </div>
+</section>
+
+<style>
+  .work { padding-block: 7rem; }
+  .work-title { margin-block: 2rem 3rem; }
+  .rows { border-top: 1px solid var(--line); }
+  .row { border-bottom: 1px solid var(--line); }
+  .row-link {
+    display: grid; grid-template-columns: 3rem 1fr 10rem 10rem 4rem; align-items: center; gap: var(--gutter);
+    padding-block: 1.4rem; transition: padding 500ms var(--ease-out), color 300ms;
+  }
+  .thumb { display: none; }
+  .name { font-family: var(--ff-display); font-size: clamp(2rem, 4.2vw, 5.5rem); line-height: 1; letter-spacing: -0.03em; transition: transform 500ms var(--ease-out); }
+  .year { text-align: right; }
+  .rows:hover .row-link { color: var(--muted); }
+  .rows .row-link:hover { color: var(--fg); padding-block: 2rem; }
+  .row-link:hover .name { font-style: italic; transform: translateX(1rem); }
+
+  .preview {
+    position: fixed; left: 0; top: 0; z-index: 30; width: 20rem; aspect-ratio: 4 / 5;
+    pointer-events: none; overflow: hidden; border-radius: 999px 999px 0 0;
+    visibility: hidden; scale: 0;
+  }
+  .preview-img { position: absolute; inset: 0; opacity: 0; }
+
+  @media (max-width: 1000px) {
+    .work { padding-block: 5rem; }
+    .row-link { grid-template-columns: 5.5rem 1fr auto; row-gap: 0.4rem; padding-block: 1rem; }
+    .idx, .place { display: none; }
+    .thumb { display: block; grid-row: 1 / span 2; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 999px 999px 0 0; }
+    .name { grid-column: 2 / -1; align-self: end; font-size: 2rem; }
+    .type { grid-column: 2; align-self: start; }
+    .year { grid-column: 3; align-self: start; }
+    .preview { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .row-link, .name { transition: none; }
+  }
+</style>
+
+<script>
+  import { gsap } from "../../scripts/lenis-gsap";
+  import { onPage } from "../../scripts/lifecycle";
+
+  // Cursor-follow preview: an arch-shaped photo trails the pointer over the index.
+  onPage<HTMLElement>("[data-work]", (root, { mm, reduced }) => {
+    if (reduced) return;
+    mm.add("(min-width: 1001px) and (hover: hover) and (pointer: fine)", () => {
+      const preview = root.querySelector<HTMLElement>(".preview");
+      const rows = root.querySelector<HTMLElement>(".rows");
+      if (!preview || !rows) return;
+      const imgs = Array.from(preview.querySelectorAll<HTMLElement>(".preview-img"));
+      gsap.set(preview, { xPercent: -50, yPercent: -50, visibility: "visible" });
+      const xTo = gsap.quickTo(preview, "x", { duration: 0.6, ease: "power3" });
+      const yTo = gsap.quickTo(preview, "y", { duration: 0.6, ease: "power3" });
+      let current = -1;
+
+      const move = (e: PointerEvent): void => { xTo(e.clientX); yTo(e.clientY); };
+      const over = (e: PointerEvent): void => {
+        const row = e.target instanceof Element ? e.target.closest<HTMLElement>(".row") : null;
+        const i = Number(row?.dataset.index ?? -1);
+        if (i < 0 || i === current) return;
+        current = i;
+        imgs.forEach((img, j) => gsap.to(img, { opacity: j === i ? 1 : 0, duration: 0.4, overwrite: true }));
+        gsap.to(preview, { rotation: gsap.utils.random(-5, 5), duration: 0.8, ease: "power3.out" });
+      };
+      const enter = (e: PointerEvent): void => {
+        gsap.set(preview, { x: e.clientX, y: e.clientY });
+        gsap.to(preview, { scale: 1, duration: 0.7, ease: "power3.out", overwrite: "auto" });
+      };
+      const leave = (): void => {
+        current = -1;
+        gsap.to(preview, { scale: 0, duration: 0.4, ease: "power2.in", overwrite: "auto" });
+      };
+      rows.addEventListener("pointermove", move);
+      rows.addEventListener("pointerover", over);
+      rows.addEventListener("pointerenter", enter);
+      rows.addEventListener("pointerleave", leave);
+      return () => {
+        rows.removeEventListener("pointermove", move);
+        rows.removeEventListener("pointerover", over);
+        rows.removeEventListener("pointerenter", enter);
+        rows.removeEventListener("pointerleave", leave);
+      };
+    });
+  });
+</script>

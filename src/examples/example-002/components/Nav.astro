@@ -1,0 +1,119 @@
+---
+const links = [
+  { href: "#tune", label: "Tune in", meta: "4 stages" },
+  { href: "#lineup", label: "Line-up", meta: "3 nights" },
+  { href: "#passes", label: "Passes", meta: "Phase 2" },
+  { href: "#harbour", label: "The harbour", meta: "Info + FAQ" },
+];
+---
+<header class="nav">
+  <a href="/example-002/" class="logo" aria-label="Sinyal home">
+    <span class="dot live" aria-hidden="true"></span>
+    <span>Sinyal<sup>26</sup></span>
+  </a>
+  <p class="mono freq" aria-hidden="true">Jakarta · 14—16.11</p>
+  <div class="actions">
+    <a href="#passes" class="btn passes">Get passes</a>
+    <button class="menu-toggle mono" aria-expanded="false" aria-controls="menu">
+      <span class="toggle-word"><span>Menu</span><span>Close</span></span>
+    </button>
+  </div>
+</header>
+
+<div id="menu" class="menu" hidden>
+  <span class="menu-layer" aria-hidden="true"></span>
+  <span class="menu-layer" aria-hidden="true"></span>
+  <span class="menu-layer" aria-hidden="true"></span>
+  <div class="menu-panel">
+    <nav aria-label="Main">
+      <ul>
+        {links.map((l, i) => (
+          <li>
+            <a href={l.href} class="menu-item">
+              <span class="mono menu-sub idx">0{i + 1}</span>
+              <span class="menu-link">{l.label}</span>
+              <span class="mono menu-sub meta">{l.meta}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="menu-foot">
+      <p class="mono menu-sub">Pelabuhan Sunda Kelapa<br />Jakarta Utara</p>
+      <p class="mono menu-sub">Fri 14 — Sun 16 Nov 2026<br />Doors 18:00 WIB</p>
+      <p class="mono menu-sub">Instagram · Telegram · Radio stream</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .nav {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem;
+    padding: 0.9rem var(--gutter);
+    color: var(--ink);
+    transition: color 300ms var(--ease-out);
+  }
+  .nav.is-dark { color: var(--paper); }
+  .logo {
+    display: inline-flex; align-items: center; gap: 0.5rem; justify-self: start;
+    font-family: var(--ff-display); font-weight: 700; text-transform: uppercase; font-size: 1.9rem; line-height: 1; letter-spacing: 0;
+  }
+  .logo .dot { width: 0.4em; height: 0.4em; }
+  .logo sup { font-family: var(--ff-mono); font-size: 0.7rem; vertical-align: top; margin-left: 0.15rem; }
+  .freq { justify-self: center; }
+  .actions { justify-self: end; display: flex; align-items: center; gap: 1.25rem; }
+  .passes { padding: 0.7rem 1rem; font-size: 0.75rem; }
+  .nav.is-dark .passes { background: var(--paper); color: var(--ink); }
+  .menu-toggle { position: relative; z-index: 2; padding: 0.5rem 0; }
+  .toggle-word { display: inline-flex; flex-direction: column; height: 1.15em; overflow: hidden; }
+  .toggle-word span { display: block; }
+  :global(body:has(.menu:not([hidden]))) .nav { color: var(--paper); }
+  :global(body:has(.menu:not([hidden]))) .passes { opacity: 0; pointer-events: none; }
+
+  .menu { position: fixed; inset: 0; z-index: 40; }
+  .menu-layer { position: absolute; inset: 0; transform-origin: top; }
+  .menu-layer:nth-child(1) { background: var(--base-300); }
+  .menu-layer:nth-child(2) { background: var(--paper); }
+  .menu-layer:nth-child(3) { background: var(--ink); }
+  :global(html.js-motion) .menu-layer { transform: scaleY(0); }
+  .menu-panel {
+    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+    padding: 6rem var(--gutter) var(--gutter); color: var(--paper);
+  }
+  .menu-item {
+    display: grid; grid-template-columns: 4rem 1fr auto; align-items: end; gap: 1rem;
+    padding-block: 0.4rem; border-bottom: 1px solid color-mix(in oklab, var(--paper) 25%, transparent);
+  }
+  .menu-link {
+    font-family: var(--ff-display); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(3.5rem, 10vw, 9rem); line-height: 0.85;
+    transition: transform 400ms var(--ease-out);
+  }
+  .menu-item:hover .menu-link { transform: translateX(1.5rem); }
+  .idx, .meta { padding-bottom: 0.6rem; }
+  .menu-foot { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gutter); }
+
+  @media (max-width: 1000px) {
+    .nav { grid-template-columns: 1fr auto; }
+    .freq, .passes { display: none; }
+    .menu-item { grid-template-columns: 2.5rem 1fr; }
+    .meta { display: none; }
+    .menu-foot { grid-template-columns: 1fr; gap: 0.75rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .menu-link { transition: none; } }
+</style>
+
+<script>
+  import { ScrollTrigger } from "../scripts/lenis-gsap";
+  const nav = document.querySelector<HTMLElement>(".nav");
+  // Nav turns mustard over the blue sections. Hit-test at the nav's baseline on every scroll:
+  // robust against the tuner pin, whose spacer shifts every section below it.
+  const darks = Array.from(document.querySelectorAll<HTMLElement>("[data-nav-dark]"));
+  const update = (): void => {
+    const y = 40;
+    const dark = darks.some((s) => { const r = s.getBoundingClientRect(); return r.top <= y && r.bottom > y; });
+    nav?.classList.toggle("is-dark", dark);
+  };
+  ScrollTrigger.create({ start: 0, end: "max", onUpdate: update, onRefresh: update });
+</script>

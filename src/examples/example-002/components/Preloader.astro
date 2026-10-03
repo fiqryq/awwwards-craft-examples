@@ -1,0 +1,40 @@
+---
+const COLS = 12;
+const ROWS = 7;
+const tiles = Array.from({ length: COLS * ROWS }, (_, i) => i);
+---
+<div class="preloader" aria-hidden="true" style={`--cols:${COLS};--rows:${ROWS}`}>
+  <div class="tiles">{tiles.map(() => <span class="tile"></span>)}</div>
+  <div class="pre-content">
+    <div class="pre-top">
+      <p class="mono">Searching signal</p>
+      <p class="mono">Edisi 04 · 2026</p>
+    </div>
+    <p class="pre-freq tnum"><span class="pre-freq-value">087.5</span><span class="unit">MHz</span></p>
+    <div class="pre-bottom">
+      <p class="mono">Sinyal — festival of broadcast sound</p>
+      <p class="mono pre-status">No carrier</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .preloader { position: fixed; inset: 0; z-index: 100; display: none; color: var(--paper); }
+  :global(html.js-motion.first-visit) .preloader { display: block; }
+  .tiles {
+    position: absolute; inset: 0; display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr); grid-template-rows: repeat(var(--rows), 1fr);
+  }
+  /* 1px overlap hides hairline seams between tiles */
+  .tile { background: var(--ink); margin: -0.5px; transform-origin: bottom; }
+  .pre-content {
+    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+    padding: var(--gutter);
+  }
+  .pre-top, .pre-bottom { display: flex; justify-content: space-between; gap: 1rem; }
+  .pre-freq {
+    font-family: var(--ff-display); font-weight: 700; line-height: 0.75;
+    font-size: clamp(7rem, 26vw, 32rem); text-align: center; letter-spacing: -0.02em;
+  }
+  .unit { font-family: var(--ff-mono); font-size: 0.06em; font-weight: 400; letter-spacing: 0.04em; vertical-align: top; margin-left: 0.5rem; }
+</style>

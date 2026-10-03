@@ -1,0 +1,48 @@
+---
+import { PROGRAMME } from "../../data";
+---
+<section class="programme" id="programme">
+  <div class="container">
+    <div class="label-row">
+      <p class="label">[ 03 ] Programme</p>
+      <p class="label">Autumn 2026</p>
+    </div>
+    <h2 class="title" data-copy="lines">Around the <em>work</em></h2>
+    <ol class="rows">
+      {PROGRAMME.map((e) => (
+        <li class="row reveal-up">
+          <a href="#visit" class="row-link">
+            <span class="date">{e.date}</span>
+            <span class="label kind">{e.kind}</span>
+            <span class="row-title">{e.title}</span>
+            <span class="label note">{e.note}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .programme { padding-block: 7rem; }
+  .title { margin-block: 2.5rem 3.5rem; }
+  .title em { font-style: italic; }
+  .rows { border-top: 1px solid var(--line); }
+  .row { border-bottom: 1px solid var(--line); }
+  .row-link {
+    display: grid; grid-template-columns: 9rem 9rem 1fr 22rem; align-items: baseline; gap: var(--gutter);
+    padding: 1.4rem 0.75rem; margin-inline: -0.75rem;
+  }
+  /* hard inversion — no fade */
+  .row-link:hover, .row-link:focus-visible { background: var(--ink); color: var(--paper); }
+  .date { font-family: var(--ff-display); font-size: 2.6rem; line-height: 0.9; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .row-title { font-family: var(--ff-display); font-size: clamp(1.5rem, 2.3vw, 2.6rem); line-height: 1.05; letter-spacing: -0.015em; }
+  .note { text-align: right; }
+  @media (max-width: 1000px) {
+    .programme { padding-block: 5rem; }
+    .row-link { grid-template-columns: 5.5rem 1fr; row-gap: 0.5rem; }
+    .kind { grid-column: 2; grid-row: 1; align-self: center; }
+    .row-title { grid-column: 1 / -1; }
+    .note { grid-column: 1 / -1; text-align: left; }
+  }
+</style>
